@@ -9,22 +9,89 @@
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
       
       <a-assets>
-        <video id="maVideo" src="WhatsApp Video 2025-12-30 at 00.30.58.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline></video>
+        <video id="maVideo" src="WhatsApp Video 2025-12-30 at 01.21.40.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline></video>
+        <!-- Pattern QR code à imprimer -->
+        <img id="qrPattern" src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" crossorigin="anonymous">
       </a-assets>
 
-      <a-marker preset="hiro">
-        <a-video src="#maVideo" width="1.6" height="0.9" position="0 0 0" rotation="-90 0 0"></a-video>
+      <!-- Marqueur basé sur un pattern (peut être un QR code personnalisé) -->
+      <a-marker 
+        type="pattern" 
+        url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.patt"
+        raycaster="objects: .clickable"
+        emitevents="true"
+        cursor="fuse: false; rayOrigin: mouse;">
+        
+        <a-video 
+          src="#maVideo" 
+          width="1.6" 
+          height="0.9" 
+          position="0 0 0" 
+          rotation="-90 0 0"
+          class="clickable"
+          event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1"
+          event-set__leave="_event: mouseleave; scale: 1 1 1">
+        </a-video>
+        
+        <!-- Annotation optionnelle -->
+        <a-text 
+          value="Cliquez pour jouer" 
+          position="0 -0.6 0" 
+          color="#FF5733" 
+          align="center"
+          scale="0.5 0.5 0.5">
+        </a-text>
       </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
 
+    <div style="position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-family: Arial; z-index: 1000;">
+      <p>Scannez ce QR code avec votre appareil :</p>
+      <p>Ou utilisez le marqueur Hiro standard</p>
+      <p><small>Cliquez sur la vidéo pour la lire</small></p>
+    </div>
+
     <script>
-      document.body.addEventListener('click', function () {
-        var v = document.querySelector('#maVideo');
-        v.play();
+      document.addEventListener('DOMContentLoaded', function() {
+        // Démarrer la vidéo au clic
+        document.body.addEventListener('click', function() {
+          var v = document.querySelector('#maVideo');
+          if (v.paused) {
+            v.play();
+          } else {
+            v.pause();
+          }
+        });
+        
+        // Gestionnaire pour les événements de marqueur
+        const marker = document.querySelector('a-marker');
+        
+        marker.addEventListener('markerFound', function() {
+          console.log('QR Code/Marqueur détecté !');
+        });
+        
+        marker.addEventListener('markerLost', function() {
+          console.log('QR Code/Marqueur perdu');
+        });
       });
     </script>
+    
+    <style>
+      /* Style pour améliorer l'expérience mobile */
+      a-scene {
+        width: 100vw;
+        height: 100vh;
+      }
+      
+      /* Message d'instructions */
+      @media (max-width: 768px) {
+        div {
+          font-size: 14px;
+          background: rgba(0,0,0,0.7);
+          padding: 10px;
+        }
+      }
+    </style>
   </body>
 </html>
-
