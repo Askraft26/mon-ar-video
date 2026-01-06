@@ -1,36 +1,46 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Match: BF vs CIV</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR Match: BF vs CIV</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
-<body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        
-        <a-assets>
-            <img id="drapeauBF" src="bf.png">
-            <img id="drapeauCIV" src="civ.png">
-        </a-assets>
+<body style="margin:0; overflow:hidden;">
+  <a-scene embedded 
+           arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
+    
+    <!-- Assets -->
+    <a-assets>
+      <img id="drapeauBF" src="bf.png">
+      <img id="drapeauCIV" src="civ.png">
+    </a-assets>
 
-        <a-marker preset="hiro">
-            
-            <a-plane position="-0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauBF">
-                <a-text value="BURKINA FASO" align="center" position="0 -0.6 0.1" scale="0.4 0.4 0.4" color="white"></a-text>
-            </a-plane>
+    <!-- Marqueur Hiro avec lissage -->
+    <a-marker preset="hiro" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
+      
+      <!-- Drapeau Burkina Faso -->
+      <a-plane position="-0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauBF">
+        <a-text value="BURKINA FASO" align="center" position="0 -0.6 0.1" 
+                scale="0.4 0.4 0.4" color="white"></a-text>
+      </a-plane>
 
-            <a-text value="VS" align="center" position="0 0 0" rotation="-90 0 0" color="#FFD700" width="5" font="monoid"></a-text>
+      <!-- Texte VS -->
+      <a-text value="VS" align="center" position="0 0 0" rotation="-90 0 0" 
+              color="#FFD700" width="5" font="monoid"></a-text>
 
-            <a-plane position="0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauCIV">
-                <a-text value="COTE D'IVOIRE" align="center" position="0 -0.6 0.1" scale="0.4 0.4 0.4" color="white"></a-text>
-            </a-plane>
+      <!-- Drapeau Côte d'Ivoire -->
+      <a-plane position="0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauCIV">
+        <a-text value="COTE D'IVOIRE" align="center" position="0 -0.6 0.1" 
+                scale="0.4 0.4 0.4" color="white"></a-text>
+      </a-plane>
 
-        </a-marker>
+    </a-marker>
 
-        <a-entity camera></a-entity>
-    </a-scene>
+    <!-- Caméra optimisée -->
+    <a-entity camera="fov: 80; near: 0.1; far: 1000;"></a-entity>
+  </a-scene>
 </body>
 </html>
