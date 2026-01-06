@@ -8,7 +8,7 @@
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
-<body style="margin:0; overflow:hidden; background:#111;">
+<body style="margin:0; overflow:hidden;">
   <a-scene embedded 
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
     
@@ -22,24 +22,19 @@
     <a-marker preset="hiro" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="5">
       
       <!-- Drapeau Burkina Faso -->
-      <a-plane position="-0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauBF" 
-               material="shader: flat; opacity: 1; side: double; color: #004400;">
+      <a-plane position="-0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauBF">
         <a-text value="BURKINA FASO" align="center" position="0 -0.6 0.1" 
-                scale="0.4 0.4 0.4" color="#FFD700" shadow="cast:true;"></a-text>
+                scale="0.4 0.4 0.4" color="white"></a-text>
       </a-plane>
 
-      <!-- Texte VS avec effet glow -->
+      <!-- Texte VS -->
       <a-text value="VS" align="center" position="0 0 0" rotation="-90 0 0" 
-              color="#FFD700" width="5" font="monoid" 
-              shadow="cast:true;" 
-              material="shader: flat; color: #FFD700; opacity: 1;">
-      </a-text>
+              color="#FFD700" width="5" font="monoid"></a-text>
 
       <!-- Drapeau Côte d'Ivoire -->
-      <a-plane position="0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauCIV" 
-               material="shader: flat; opacity: 1; side: double; color: #002244;">
+      <a-plane position="0.7 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="#drapeauCIV">
         <a-text value="COTE D'IVOIRE" align="center" position="0 -0.6 0.1" 
-                scale="0.4 0.4 0.4" color="#00FFAA" shadow="cast:true;"></a-text>
+                scale="0.4 0.4 0.4" color="white"></a-text>
       </a-plane>
 
     </a-marker>
@@ -49,4 +44,3 @@
   </a-scene>
 </body>
 </html>
-
