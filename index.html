@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AR Match: BF vs CIV</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
@@ -10,38 +10,51 @@
 </head>
 
 <body style="margin:0; overflow:hidden; background:#111;">
-  <a-scene embedded 
-           arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
+  <a-scene embedded arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
     
     <!-- Assets -->
     <a-assets>
       <img id="drapeauBF" src="bf.png">
       <img id="drapeauCIV" src="civ.png">
+      <!-- Police MSDF en gras pour un vrai rendu bold -->
+      <!-- (A-Frame charge directement via URL) -->
     </a-assets>
 
     <!-- Marqueur Hiro avec lissage et événements -->
-    <a-marker preset="hiro" emitevents="true" 
+    <a-marker preset="hiro" emitevents="true"
               smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
       
-      <!-- Groupe pour que tout reste aligné -->
+      <!-- Groupe pour que tout reste aligné au marqueur -->
       <a-entity>
         
         <!-- Drapeau Burkina Faso -->
         <a-plane position="-0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauBF"
                  material="shader: flat; opacity: 1; side: double;">
-          <a-text value="BURKINA FASO" align="center" position="0 -0.55 0.1" 
-                  scale="0.35 0.35 0.35" color="white"></a-text>
+          <!-- Contour noir (calque arrière, légèrement plus grand) -->
+          <a-text value="BURKINA FASO" align="center" position="0 -0.55 0.095"
+                  shader="msdf" font="https://cdn.aframe.io/fonts/Roboto-Bold-msdf.json"
+                  scale="0.38 0.38 0.38" color="#000000"></a-text>
+          <!-- Texte principal blanc (calque avant) -->
+          <a-text value="BURKINA FASO" align="center" position="0 -0.55 0.1"
+                  shader="msdf" font="https://cdn.aframe.io/fonts/Roboto-Bold-msdf.json"
+                  scale="0.35 0.35 0.35" color="#FFFFFF"></a-text>
         </a-plane>
 
         <!-- Texte VS -->
-        <a-text value="VS" align="center" position="0 0 0.1" rotation="-90 0 0" 
+        <a-text value="VS" align="center" position="0 0 0.1" rotation="-90 0 0"
                 color="#FFD700" width="4" font="monoid"></a-text>
 
         <!-- Drapeau Côte d'Ivoire -->
         <a-plane position="0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauCIV"
                  material="shader: flat; opacity: 1; side: double;">
-          <a-text value="COTE D'IVOIRE" align="center" position="0 -0.55 0.1" 
-                  scale="0.35 0.35 0.35" color="white"></a-text>
+          <!-- Contour noir -->
+          <a-text value="COTE D'IVOIRE" align="center" position="0 -0.55 0.095"
+                  shader="msdf" font="https://cdn.aframe.io/fonts/Roboto-Bold-msdf.json"
+                  scale="0.38 0.38 0.38" color="#000000"></a-text>
+          <!-- Texte principal blanc -->
+          <a-text value="COTE D'IVOIRE" align="center" position="0 -0.55 0.1"
+                  shader="msdf" font="https://cdn.aframe.io/fonts/Roboto-Bold-msdf.json"
+                  scale="0.35 0.35 0.35" color="#FFFFFF"></a-text>
         </a-plane>
 
       </a-entity>
@@ -51,14 +64,11 @@
     <a-entity camera="fov: 75; near: 0.1; far: 1000;"></a-entity>
   </a-scene>
 
-  <!-- Script pour gérer les événements du marqueur -->
+  <!-- Événements du marqueur -->
   <script>
-    document.querySelector("a-marker").addEventListener("markerFound", () => {
-      console.log("Marqueur détecté ✅");
-    });
-    document.querySelector("a-marker").addEventListener("markerLost", () => {
-      console.log("Marqueur perdu ❌");
-    });
+    const marker = document.querySelector("a-marker");
+    marker.addEventListener("markerFound", () => console.log("Marqueur détecté ✅"));
+    marker.addEventListener("markerLost", () => console.log("Marqueur perdu ❌"));
   </script>
 </body>
 </html>
