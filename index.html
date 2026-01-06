@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AR Match: BF vs CIV</title>
+  <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
-<body style="margin:0; overflow:hidden;">
+<body style="margin:0; overflow:hidden; background:#111;">
   <a-scene embedded 
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
     
@@ -18,31 +19,46 @@
       <img id="drapeauCIV" src="civ.png">
     </a-assets>
 
-    <!-- Marqueur Hiro avec lissage -->
-    <a-marker preset="hiro" smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
+    <!-- Marqueur Hiro avec lissage et événements -->
+    <a-marker preset="hiro" emitevents="true" 
+              smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
       
-      <!-- Drapeau Burkina Faso -->
-      <a-plane position="-0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauBF"
-               material="shader: flat; opacity: 1; side: double;">
-        <a-text value="BURKINA FASO" align="center" position="0 -0.55 0.1" 
-                scale="0.35 0.35 0.35" color="white"></a-text>
-      </a-plane>
+      <!-- Groupe pour que tout reste aligné -->
+      <a-entity>
+        
+        <!-- Drapeau Burkina Faso -->
+        <a-plane position="-0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauBF"
+                 material="shader: flat; opacity: 1; side: double;">
+          <a-text value="BURKINA FASO" align="center" position="0 -0.55 0.1" 
+                  scale="0.35 0.35 0.35" color="white"></a-text>
+        </a-plane>
 
-      <!-- Texte VS -->
-      <a-text value="VS" align="center" position="0 0 0.1" rotation="-90 0 0" 
-              color="#FFD700" width="4" font="monoid"></a-text>
+        <!-- Texte VS -->
+        <a-text value="VS" align="center" position="0 0 0.1" rotation="-90 0 0" 
+                color="#FFD700" width="4" font="monoid"></a-text>
 
-      <!-- Drapeau Côte d'Ivoire -->
-      <a-plane position="0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauCIV"
-               material="shader: flat; opacity: 1; side: double;">
-        <a-text value="COTE D'IVOIRE" align="center" position="0 -0.55 0.1" 
-                scale="0.35 0.35 0.35" color="white"></a-text>
-      </a-plane>
+        <!-- Drapeau Côte d'Ivoire -->
+        <a-plane position="0.6 0 0" rotation="-90 0 0" width="1.1" height="0.7" src="#drapeauCIV"
+                 material="shader: flat; opacity: 1; side: double;">
+          <a-text value="COTE D'IVOIRE" align="center" position="0 -0.55 0.1" 
+                  scale="0.35 0.35 0.35" color="white"></a-text>
+        </a-plane>
 
+      </a-entity>
     </a-marker>
 
     <!-- Caméra optimisée -->
     <a-entity camera="fov: 75; near: 0.1; far: 1000;"></a-entity>
   </a-scene>
+
+  <!-- Script pour gérer les événements du marqueur -->
+  <script>
+    document.querySelector("a-marker").addEventListener("markerFound", () => {
+      console.log("Marqueur détecté ✅");
+    });
+    document.querySelector("a-marker").addEventListener("markerLost", () => {
+      console.log("Marqueur perdu ❌");
+    });
+  </script>
 </body>
 </html>
