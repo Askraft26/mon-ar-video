@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Fixé sur Hiro</title>
+  <title>AR Fixé sur Hiro Stable</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -20,12 +20,12 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro avec lissage activé -->
+    <!-- Marqueur Hiro avec lissage renforcé -->
     <a-marker preset="hiro" emitevents="true"
-              smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
+              smooth="true" smoothCount="20" smoothTolerance="0.001" smoothThreshold="10">
       
-      <!-- Groupe fixe attaché au marqueur -->
-      <a-entity>
+      <!-- Contenu fixé -->
+      <a-entity id="fixedContent" rotation="0 0 0">
         <!-- Image du drapeau -->
         <a-plane src="#civ" position="-0.6 0 0" rotation="-90 0 0"
                  width="0.5" height="0.3"
@@ -44,14 +44,25 @@
 
   <script>
     const marker = document.querySelector("a-marker");
+    const fixedContent = document.querySelector("#fixedContent");
+
+    let locked = false;
+
     marker.addEventListener("markerFound", () => {
       console.log("Marqueur Hiro détecté ✅");
+      if (!locked) {
+        // On capture la position initiale et on la fige
+        const pos = fixedContent.object3D.position.clone();
+        const rot = fixedContent.object3D.rotation.clone();
+        fixedContent.setAttribute("position", `${pos.x} ${pos.y} ${pos.z}`);
+        fixedContent.setAttribute("rotation", `${rot.x} ${rot.y} ${rot.z}`);
+        locked = true;
+      }
     });
+
     marker.addEventListener("markerLost", () => {
       console.log("Marqueur Hiro perdu ❌");
     });
   </script>
 </body>
 </html>
-
-
