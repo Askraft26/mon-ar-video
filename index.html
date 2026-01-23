@@ -3,70 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Galerie VR Hybride</title>
-  <!-- A-Frame et AR.js -->
+  <title>Zoom Spatial + Tactile</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
 <body style="margin:0; overflow:hidden; background:#111;">
-  <a-scene embedded
-           arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
-           renderer="antialias: true;">
-    
-    <!-- Préchargement des assets -->
+  <a-scene renderer="antialias: true;">
     <a-assets>
       <img id="civ" src="civ.png">
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro (déclencheur AR) -->
-    <a-marker preset="hiro" emitevents="true">
-      <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
-      <a-text value="Scanner Hiro pour lancer la galerie"
-              position="0 -0.5 0.1" rotation="-90 0 0"
-              color="#FFFFFF" width="4"></a-text>
-    </a-marker>
+    <!-- Image flottante -->
+    <a-plane id="zoomImage" src="#cv" position="0 1.5 -3" rotation="0 0 0"
+             width="2" height="3"
+             material="shader: flat; side: double;"></a-plane>
 
-    <!-- Galerie VR indépendante du marqueur -->
-    <a-entity id="vrGallery" visible="false">
-      <!-- Point 1 -->
-      <a-plane src="#civ" position="-3 1.5 -4" rotation="0 0 0"
-               width="1.5" height="1"
-               material="shader: flat; side: double;"></a-plane>
-
-      <!-- Point 2 -->
-      <a-plane src="#cv" position="0 1.5 -6" rotation="0 0 0"
-               width="2" height="3"
-               material="shader: flat; side: double;"></a-plane>
-
-      <!-- Point 3 -->
-      <a-plane src="#civ" position="3 1.5 -4" rotation="0 0 0"
-               width="1.5" height="1"
-               material="shader: flat; side: double;"></a-plane>
-
-      <!-- Point 4 -->
-      <a-plane src="#cv" position="0 3 -8" rotation="0 0 0"
-               width="2" height="3"
-               material="shader: flat; side: double;"></a-plane>
-    </a-entity>
-
-    <!-- Caméra + contrôles VR -->
-    <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
+    <!-- Caméra -->
+    <a-entity id="cameraRig" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
-    const marker = document.querySelector("a-marker");
-    const vrGallery = document.querySelector("#vrGallery");
+    const cameraRig = document.querySelector("#cameraRig");
+    const zoomImage = document.querySelector("#zoomImage");
 
-    marker.addEventListener("markerFound", () => {
-      console.log("Marqueur Hiro détecté ✅");
-      vrGallery.setAttribute("visible", "true");
+    // Zoom spatial automatique : l'image change d'échelle selon la distance caméra
+    function updateZoom() {
+      const camPos = cameraRig.object3D.position;
+      const imgPos = zoomImage.object3D.position;
+      const distance = camPos.distanceTo(imgPos);
+
+      // Calcul d'un facteur de zoom basé sur la distance
+      const scaleFactor = Math.max(0.5, 5 / distance); 
+      zoomImage.setAttribute("scale", `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
+      requestAnimationFrame(updateZoom);
+    }
+    updateZoom();
+
+    // Zoom tactile volontaire (pinch-to-zoom)
+    let initialDistance = null;
+    document.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const distance = Math.sqrt(dx*dx + dy*dy);
+
+        if (!initialDistance) initialDistance = distance;
+        const pinchScale = distance / initialDistance;
+
+        zoomImage.setAttribute("scale", `${pinchScale} ${pinchScale} ${pinchScale}`);
+      }
     });
 
-    marker.addEventListener("markerLost", () => {
-      console.log("Marqueur Hiro perdu ❌");
-      // La galerie reste visible et stable
+    document.addEventListener("touchend", () => {
+      initialDistance = null;
     });
   </script>
 </body>
