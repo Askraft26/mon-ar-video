@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Image + PDF</title>
+  <title>AR Images Only</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -15,24 +15,18 @@
     <!-- Marqueur Hiro -->
     <a-marker preset="hiro" emitevents="true">
       
-      <!-- Affichage de l'image -->
+      <!-- Affiche le drapeau -->
       <a-plane position="-0.6 0 0" rotation="-90 0 0" width="1" height="0.7" src="civ.png"
                material="shader: flat; side: double;"></a-plane>
 
-      <!-- Affichage du PDF via une iframe intégrée -->
-      <a-entity position="0.8 0 0" rotation="-90 0 0">
-        <a-entity geometry="primitive: plane; width: 1.2; height: 0.8"
-                  material="shader: flat; side: double;
-                            src: #pdfTexture"></a-entity>
-      </a-entity>
+      <!-- Affiche ton CV converti en image -->
+      <a-plane position="0.8 0 0" rotation="-90 0 0" width="1.2" height="0.8" src="CVDanielHoba.jpg"
+               material="shader: flat; side: double;"></a-plane>
     </a-marker>
 
     <!-- Caméra -->
     <a-entity camera></a-entity>
   </a-scene>
-
-  <!-- Trick pour charger le PDF dans une texture -->
-  <iframe id="pdfTexture" src="CVDanielHoba.pdf" style="display:none;"></iframe>
 
   <script>
     const marker = document.querySelector("a-marker");
