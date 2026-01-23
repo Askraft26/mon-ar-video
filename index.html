@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Hiro Stable Hybride</title>
+  <title>Galerie VR Hybride</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -20,42 +20,53 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro (uniquement pour déclenchement) -->
-    <a-marker preset="hiro" emitevents="true"
-              smooth="true" smoothCount="30" smoothTolerance="0.001" smoothThreshold="15">
+    <!-- Marqueur Hiro (déclencheur AR) -->
+    <a-marker preset="hiro" emitevents="true">
       <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
+      <a-text value="Scanner Hiro pour lancer la galerie"
+              position="0 -0.5 0.1" rotation="-90 0 0"
+              color="#FFFFFF" width="4"></a-text>
     </a-marker>
 
-    <!-- Contenu VR/AR indépendant du marqueur -->
-    <a-entity id="fixedContent" visible="false">
-      <!-- Image du drapeau -->
-      <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0"
+    <!-- Galerie VR indépendante du marqueur -->
+    <a-entity id="vrGallery" visible="false">
+      <!-- Point 1 -->
+      <a-plane src="#civ" position="-3 1.5 -4" rotation="0 0 0"
                width="1.5" height="1"
                material="shader: flat; side: double;"></a-plane>
 
-      <!-- Image du CV -->
-      <a-plane src="#cv" position="2 1.5 -3" rotation="0 0 0"
+      <!-- Point 2 -->
+      <a-plane src="#cv" position="0 1.5 -6" rotation="0 0 0"
+               width="2" height="3"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Point 3 -->
+      <a-plane src="#civ" position="3 1.5 -4" rotation="0 0 0"
+               width="1.5" height="1"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Point 4 -->
+      <a-plane src="#cv" position="0 3 -8" rotation="0 0 0"
                width="2" height="3"
                material="shader: flat; side: double;"></a-plane>
     </a-entity>
 
-    <!-- Caméra + contrôles -->
+    <!-- Caméra + contrôles VR -->
     <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
     const marker = document.querySelector("a-marker");
-    const fixedContent = document.querySelector("#fixedContent");
+    const vrGallery = document.querySelector("#vrGallery");
 
     marker.addEventListener("markerFound", () => {
       console.log("Marqueur Hiro détecté ✅");
-      // Active le contenu une fois Hiro scanné
-      fixedContent.setAttribute("visible", "true");
+      vrGallery.setAttribute("visible", "true");
     });
 
     marker.addEventListener("markerLost", () => {
       console.log("Marqueur Hiro perdu ❌");
-      // Le contenu reste visible et stable
+      // La galerie reste visible et stable
     });
   </script>
 </body>
