@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR + VR Hybride</title>
+  <title>AR Hiro Stable Hybride</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -20,17 +20,14 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro -->
-    <a-marker preset="hiro" emitevents="true">
-      <!-- Contenu AR déclencheur -->
+    <!-- Marqueur Hiro (uniquement pour déclenchement) -->
+    <a-marker preset="hiro" emitevents="true"
+              smooth="true" smoothCount="30" smoothTolerance="0.001" smoothThreshold="15">
       <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
-      <a-text value="Scanner Hiro pour lancer l'expérience"
-              position="0 -0.5 0.1" rotation="-90 0 0"
-              color="#FFFFFF" width="4"></a-text>
     </a-marker>
 
-    <!-- Contenu VR (fixé dans l'espace, indépendant du marqueur) -->
-    <a-entity id="vrContent" visible="false">
+    <!-- Contenu VR/AR indépendant du marqueur -->
+    <a-entity id="fixedContent" visible="false">
       <!-- Image du drapeau -->
       <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0"
                width="1.5" height="1"
@@ -42,23 +39,23 @@
                material="shader: flat; side: double;"></a-plane>
     </a-entity>
 
-    <!-- Caméra + contrôles VR -->
+    <!-- Caméra + contrôles -->
     <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
     const marker = document.querySelector("a-marker");
-    const vrContent = document.querySelector("#vrContent");
+    const fixedContent = document.querySelector("#fixedContent");
 
     marker.addEventListener("markerFound", () => {
       console.log("Marqueur Hiro détecté ✅");
-      // Active le contenu VR une fois Hiro scanné
-      vrContent.setAttribute("visible", "true");
+      // Active le contenu une fois Hiro scanné
+      fixedContent.setAttribute("visible", "true");
     });
 
     marker.addEventListener("markerLost", () => {
       console.log("Marqueur Hiro perdu ❌");
-      // Le contenu VR reste visible même si Hiro disparaît
+      // Le contenu reste visible et stable
     });
   </script>
 </body>
