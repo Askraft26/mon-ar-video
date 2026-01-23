@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Hiro Lecture Partielle</title>
+  <title>AR + VR Hybride</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -12,7 +12,7 @@
 <body style="margin:0; overflow:hidden; background:#111;">
   <a-scene embedded
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
-           renderer="logarithmicDepthBuffer: true; antialias: true;">
+           renderer="antialias: true;">
     
     <!-- Préchargement des assets -->
     <a-assets>
@@ -20,57 +20,46 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro avec tolérance augmentée -->
-    <a-marker preset="hiro" emitevents="true"
-              smooth="true" smoothCount="25" smoothTolerance="0.005" smoothThreshold="15">
-      
-      <!-- Contenu fixé -->
-      <a-entity id="fixedContent" rotation="0 0 0">
-        <!-- Image du drapeau -->
-        <a-plane src="#civ" position="-1.5 2 0" rotation="-90 0 0"
-                 width="0.5" height="0.3"
-                 material="shader: flat; side: double;"></a-plane>
-
-        <!-- Image du CV -->
-        <a-plane src="#cv" position="0 0 0" rotation="-90 0 0"
-                 width="3" height="4"
-                 material="shader: flat; side: double;"></a-plane>
-      </a-entity>
+    <!-- Marqueur Hiro -->
+    <a-marker preset="hiro" emitevents="true">
+      <!-- Contenu AR déclencheur -->
+      <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
+      <a-text value="Scanner Hiro pour lancer l'expérience"
+              position="0 -0.5 0.1" rotation="-90 0 0"
+              color="#FFFFFF" width="4"></a-text>
     </a-marker>
 
-    <!-- Caméra -->
-    <a-entity camera="fov: 75; near: 0.1; far: 1000;"></a-entity>
+    <!-- Contenu VR (fixé dans l'espace, indépendant du marqueur) -->
+    <a-entity id="vrContent" visible="false">
+      <!-- Image du drapeau -->
+      <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0"
+               width="1.5" height="1"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Image du CV -->
+      <a-plane src="#cv" position="2 1.5 -3" rotation="0 0 0"
+               width="2" height="3"
+               material="shader: flat; side: double;"></a-plane>
+    </a-entity>
+
+    <!-- Caméra + contrôles VR -->
+    <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
     const marker = document.querySelector("a-marker");
-    const fixedContent = document.querySelector("#fixedContent");
-
-    let locked = false;
-    let lastPos = null;
-    let lastRot = null;
+    const vrContent = document.querySelector("#vrContent");
 
     marker.addEventListener("markerFound", () => {
       console.log("Marqueur Hiro détecté ✅");
-      if (!locked) {
-        // Capture initiale
-        lastPos = fixedContent.object3D.position.clone();
-        lastRot = fixedContent.object3D.rotation.clone();
-        locked = true;
-      }
+      // Active le contenu VR une fois Hiro scanné
+      vrContent.setAttribute("visible", "true");
     });
 
     marker.addEventListener("markerLost", () => {
       console.log("Marqueur Hiro perdu ❌");
-      if (locked && lastPos && lastRot) {
-        // On garde la dernière position/rotation connue
-        fixedContent.setAttribute("position", `${lastPos.x} ${lastPos.y} ${lastPos.z}`);
-        fixedContent.setAttribute("rotation", `${lastRot.x} ${lastRot.y} ${lastRot.z}`);
-      }
+      // Le contenu VR reste visible même si Hiro disparaît
     });
   </script>
 </body>
 </html>
-
-
-
