@@ -3,44 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zoom Spatial + Tactile</title>
+  <title>AR avec paramètres VR</title>
+  <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 
 <body style="margin:0; overflow:hidden; background:#111;">
-  <a-scene renderer="antialias: true;">
+  <a-scene embedded
+           arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+           renderer="antialias: true;">
+    
+    <!-- Préchargement des assets -->
     <a-assets>
       <img id="civ" src="civ.png">
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Image flottante -->
-    <a-plane id="zoomImage" src="#cv" position="0 1.5 -3" rotation="0 0 0"
-             width="2" height="3"
-             material="shader: flat; side: double;"></a-plane>
+    <!-- Marqueur Hiro -->
+    <a-marker preset="hiro" emitevents="true"
+              smooth="true" smoothCount="25" smoothTolerance="0.005" smoothThreshold="15">
+      
+      <!-- Contenu AR enrichi -->
+      <a-entity id="gallery">
+        <!-- Image 1 -->
+        <a-plane src="#civ" position="-1 1 0" rotation="-90 0 0"
+                 width="1.5" height="1"
+                 material="shader: flat; side: double;"></a-plane>
 
-    <!-- Caméra -->
-    <a-entity id="cameraRig" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
+        <!-- Image 2 -->
+        <a-plane src="#cv" position="1 1 0" rotation="-90 0 0"
+                 width="2" height="3"
+                 material="shader: flat; side: double;"></a-plane>
+      </a-entity>
+    </a-marker>
+
+    <!-- Caméra avec paramètres VR appliqués à l'AR -->
+    <a-entity id="cameraRig" 
+              camera="fov: 80; near: 0.1; far: 1000" 
+              look-controls="pointerLockEnabled: true" 
+              wasd-controls="acceleration: 50" 
+              position="0 1.6 0">
+    </a-entity>
   </a-scene>
 
   <script>
     const cameraRig = document.querySelector("#cameraRig");
-    const zoomImage = document.querySelector("#zoomImage");
+    const gallery = document.querySelector("#gallery");
 
-    // Zoom spatial automatique : l'image change d'échelle selon la distance caméra
+    // Zoom spatial automatique (AR + VR)
     function updateZoom() {
       const camPos = cameraRig.object3D.position;
-      const imgPos = zoomImage.object3D.position;
+      const imgPos = gallery.object3D.position;
       const distance = camPos.distanceTo(imgPos);
 
-      // Calcul d'un facteur de zoom basé sur la distance
-      const scaleFactor = Math.max(0.5, 5 / distance); 
-      zoomImage.setAttribute("scale", `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
+      const scaleFactor = Math.max(0.5, 4 / distance);
+      gallery.setAttribute("scale", `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
       requestAnimationFrame(updateZoom);
     }
     updateZoom();
 
-    // Zoom tactile volontaire (pinch-to-zoom)
+    // Zoom tactile volontaire
     let initialDistance = null;
     document.addEventListener("touchmove", (e) => {
       if (e.touches.length === 2) {
@@ -51,7 +74,7 @@
         if (!initialDistance) initialDistance = distance;
         const pinchScale = distance / initialDistance;
 
-        zoomImage.setAttribute("scale", `${pinchScale} ${pinchScale} ${pinchScale}`);
+        gallery.setAttribute("scale", `${pinchScale} ${pinchScale} ${pinchScale}`);
       }
     });
 
