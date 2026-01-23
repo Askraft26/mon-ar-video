@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR PDF Trigger</title>
+  <title>AR Image + PDF</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -13,29 +13,34 @@
   <a-scene embedded arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;">
     
     <!-- Marqueur Hiro -->
-    <a-marker preset="hiro" emitevents="true"
-              smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
+    <a-marker preset="hiro" emitevents="true">
       
-      <!-- Petit indicateur visuel -->
-      <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
-      <a-text value="Scanner pour ouvrir PDF" align="center" position="0 -0.5 0.1" rotation="-90 0 0"
-              color="#FFFFFF" width="4"></a-text>
+      <!-- Affichage de l'image -->
+      <a-plane position="-0.6 0 0" rotation="-90 0 0" width="1" height="0.7" src="civ.png"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Affichage du PDF via une iframe intégrée -->
+      <a-entity position="0.8 0 0" rotation="-90 0 0">
+        <a-entity geometry="primitive: plane; width: 1.2; height: 0.8"
+                  material="shader: flat; side: double;
+                            src: #pdfTexture"></a-entity>
+      </a-entity>
     </a-marker>
 
     <!-- Caméra -->
     <a-entity camera></a-entity>
   </a-scene>
 
-  <!-- Script pour ouvrir le PDF -->
+  <!-- Trick pour charger le PDF dans une texture -->
+  <iframe id="pdfTexture" src="CVDanielHoba.pdf" style="display:none;"></iframe>
+
   <script>
     const marker = document.querySelector("a-marker");
     marker.addEventListener("markerFound", () => {
-      console.log("Marqueur détecté ✅");
-      // Ouvre le PDF dans un nouvel onglet
-      window.open("monfichier.pdf", "_blank");
+      console.log("Marqueur Hiro détecté ✅");
     });
     marker.addEventListener("markerLost", () => {
-      console.log("Marqueur perdu ❌");
+      console.log("Marqueur Hiro perdu ❌");
     });
   </script>
 </body>
