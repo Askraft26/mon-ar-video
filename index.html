@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Images Optimisées</title>
+  <title>AR Fixé sur Hiro</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -12,7 +12,6 @@
 <body style="margin:0; overflow:hidden; background:#111;">
   <a-scene embedded
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
-           vr-mode-ui="enabled: false"
            renderer="logarithmicDepthBuffer: true; antialias: true;">
     
     <!-- Préchargement des assets -->
@@ -21,25 +20,28 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro -->
-    <a-marker preset="hiro" emitevents="true">
+    <!-- Marqueur Hiro avec lissage activé -->
+    <a-marker preset="hiro" emitevents="true"
+              smooth="true" smoothCount="12" smoothTolerance="0.01" smoothThreshold="5">
       
-      <!-- Image du drapeau -->
-      <a-plane src="#civ" position="-0.6 0 0" rotation="-90 0 0"
-               width="1" height="0.7"
-               material="shader: flat; side: double;"></a-plane>
+      <!-- Groupe fixe attaché au marqueur -->
+      <a-entity>
+        <!-- Image du drapeau -->
+        <a-plane src="#civ" position="-0.6 0 0" rotation="-90 0 0"
+                 width="1" height="0.7"
+                 material="shader: flat; side: double;"></a-plane>
 
-      <!-- Image du CV -->
-      <a-plane src="#cv" position="0.8 0 0" rotation="-90 0 0"
-               width="1.2" height="1"
-               material="shader: flat; side: double;"></a-plane>
+        <!-- Image du CV -->
+        <a-plane src="#cv" position="0.8 0 0" rotation="-90 0 0"
+                 width="1.2" height="1"
+                 material="shader: flat; side: double;"></a-plane>
+      </a-entity>
     </a-marker>
 
     <!-- Caméra -->
     <a-entity camera="fov: 75; near: 0.1; far: 1000;"></a-entity>
   </a-scene>
 
-  <!-- Gestion des événements -->
   <script>
     const marker = document.querySelector("a-marker");
     marker.addEventListener("markerFound", () => {
@@ -51,4 +53,3 @@
   </script>
 </body>
 </html>
-
