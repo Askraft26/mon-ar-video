@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Hiro Galerie Optimisée</title>
+  <title>AR Hiro Galerie avec Zoom</title>
   <!-- A-Frame et AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -20,7 +20,7 @@
       <img id="cv" src="CVDanielHoba.jpg">
     </a-assets>
 
-    <!-- Marqueur Hiro (déclencheur) -->
+    <!-- Marqueur Hiro -->
     <a-marker preset="hiro" emitevents="true"
               smooth="true" smoothCount="30" smoothTolerance="0.001" smoothThreshold="15">
       <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
@@ -29,30 +29,24 @@
               color="#FFFFFF" width="4"></a-text>
     </a-marker>
 
-    <!-- Galerie AR disposée en cercle -->
+    <!-- Galerie AR avec zoom -->
     <a-entity id="arGallery" visible="false">
-      <!-- Image 1 -->
-      <a-plane src="#civ" position="0 1.5 -4" rotation="0 0 0"
+      <!-- Image 1 avec animation de zoom -->
+      <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0"
                width="1.5" height="1"
+               scale="0.1 0.1 0.1"
+               animation="property: scale; to: 1.5 1.5 1.5; dur: 1500; easing: easeOutElastic"
                material="shader: flat; side: double;"></a-plane>
 
-      <!-- Image 2 -->
-      <a-plane src="#cv" position="3 1.5 -3" rotation="0 -30 0"
+      <!-- Image 2 avec animation de zoom -->
+      <a-plane src="#cv" position="2 1.5 -4" rotation="0 0 0"
                width="2" height="3"
-               material="shader: flat; side: double;"></a-plane>
-
-      <!-- Image 3 -->
-      <a-plane src="#civ" position="-3 1.5 -3" rotation="0 30 0"
-               width="1.5" height="1"
-               material="shader: flat; side: double;"></a-plane>
-
-      <!-- Image 4 -->
-      <a-plane src="#cv" position="0 3 -6" rotation="0 0 0"
-               width="2" height="3"
+               scale="0.1 0.1 0.1"
+               animation="property: scale; to: 2 2 2; dur: 1500; easing: easeOutElastic"
                material="shader: flat; side: double;"></a-plane>
     </a-entity>
 
-    <!-- Caméra avec paramètres VR appliqués à l'AR -->
+    <!-- Caméra -->
     <a-entity id="cameraRig" 
               camera="fov: 80; near: 0.1; far: 1000" 
               look-controls="pointerLockEnabled: true" 
