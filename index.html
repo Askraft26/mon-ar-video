@@ -1,21 +1,79 @@
-<a-entity id="arGallery" visible="true">
-  <!-- Image 1 à gauche -->
-  <a-plane src="#civ" position="-3 1.5 -4" rotation="0 0 0"
-           width="1.5" height="1"
-           material="shader: flat; side: double;"></a-plane>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AR Hiro Galerie Optimisée</title>
+  <!-- A-Frame et AR.js -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+</head>
 
-  <!-- Image 2 au centre, plus loin -->
-  <a-plane src="#cv" position="0 1.5 -7" rotation="0 0 0"
-           width="2" height="3"
-           material="shader: flat; side: double;"></a-plane>
+<body style="margin:0; overflow:hidden; background:#111;">
+  <a-scene embedded
+           arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
+           renderer="antialias: true; logarithmicDepthBuffer: true;">
+    
+    <!-- Préchargement des assets -->
+    <a-assets>
+      <img id="civ" src="civ.png">
+      <img id="cv" src="CVDanielHoba.jpg">
+    </a-assets>
 
-  <!-- Image 3 à droite -->
-  <a-plane src="#civ" position="3 1.5 -4" rotation="0 0 0"
-           width="1.5" height="1"
-           material="shader: flat; side: double;"></a-plane>
+    <!-- Marqueur Hiro (déclencheur) -->
+    <a-marker preset="hiro" emitevents="true"
+              smooth="true" smoothCount="30" smoothTolerance="0.001" smoothThreshold="15">
+      <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
+      <a-text value="Scanner Hiro pour lancer la galerie"
+              position="0 -0.5 0.1" rotation="-90 0 0"
+              color="#FFFFFF" width="4"></a-text>
+    </a-marker>
 
-  <!-- Image 4 en hauteur -->
-  <a-plane src="#cv" position="0 3 -6" rotation="0 0 0"
-           width="2" height="3"
-           material="shader: flat; side: double;"></a-plane>
-</a-entity>
+    <!-- Galerie AR disposée en cercle -->
+    <a-entity id="arGallery" visible="false">
+      <!-- Image 1 -->
+      <a-plane src="#civ" position="0 1.5 -4" rotation="0 0 0"
+               width="1.5" height="1"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Image 2 -->
+      <a-plane src="#cv" position="3 1.5 -3" rotation="0 -30 0"
+               width="2" height="3"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Image 3 -->
+      <a-plane src="#civ" position="-3 1.5 -3" rotation="0 30 0"
+               width="1.5" height="1"
+               material="shader: flat; side: double;"></a-plane>
+
+      <!-- Image 4 -->
+      <a-plane src="#cv" position="0 3 -6" rotation="0 0 0"
+               width="2" height="3"
+               material="shader: flat; side: double;"></a-plane>
+    </a-entity>
+
+    <!-- Caméra avec paramètres VR appliqués à l'AR -->
+    <a-entity id="cameraRig" 
+              camera="fov: 80; near: 0.1; far: 1000" 
+              look-controls="pointerLockEnabled: true" 
+              wasd-controls="acceleration: 50" 
+              position="0 1.6 0">
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const marker = document.querySelector("a-marker");
+    const arGallery = document.querySelector("#arGallery");
+
+    marker.addEventListener("markerFound", () => {
+      console.log("Marqueur Hiro détecté ✅");
+      arGallery.setAttribute("visible", "true");
+    });
+
+    marker.addEventListener("markerLost", () => {
+      console.log("Marqueur Hiro perdu ❌");
+      // La galerie reste visible et stable
+    });
+  </script>
+</body>
+</html>
