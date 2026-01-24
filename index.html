@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Hiro - Perspective Automatique</title>
+  <title>AR Zoom Dynamique Hybride</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
@@ -12,7 +12,7 @@
 
   <a-scene embedded
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
-           renderer="antialias: true; logarithmicDepthBuffer: true;">
+           renderer="antialias: true;">
     
     <a-assets>
       <img id="civ" src="civ.png">
@@ -25,43 +25,75 @@
       <video id="videoBR" src="br.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
     </a-assets>
 
-    <a-marker preset="hiro" emitevents="true" id="hiroMarker">
-      
-      <a-box position="0 0 0" scale="0.1 0.1 0.1" color="#FFD700"></a-box>
-
-      <a-entity rotation="-90 0 0">
-          
-          <a-plane src="#civ" position="-1.5 0.5 0" width="1" height="0.6"></a-plane>
-          <a-plane src="#cv" position="1.5 0.5 0" width="1.2" height="1.8"></a-plane>
-
-          <a-video src="#videoCR" position="-1 2 0" width="1.5" height="0.85"></a-video>
-          <a-video src="#videoBR" position="1 2 0" width="1.5" height="0.85"></a-video>
-
-          <a-image src="#imgA1" position="-1.5 3.5 0" width="0.6" height="0.6"></a-image>
-          <a-image src="#imgA2" position="-0.5 3.5 0" width="0.6" height="0.6"></a-image>
-          <a-image src="#imgA3" position="0.5 3.5 0" width="0.6" height="0.6"></a-image>
-          <a-image src="#imgA4" position="1.5 3.5 0" width="0.6" height="0.6"></a-image>
-
-      </a-entity>
+    <a-marker preset="hiro" id="markerRef">
+        <a-box position="0 0 0" scale="0.1 0.1 0.1" color="#FFD700"></a-box>
     </a-marker>
 
-    <a-entity camera></a-entity>
+    <a-entity id="vrContent" visible="false">
+        
+        <a-entity id="dynamicScaleNode">
+            <a-plane src="#civ" position="-2 1 -4" width="1.5" height="1"></a-plane>
+            <a-plane src="#cv" position="2 1 -4" width="2" height="3"></a-plane>
+
+            <a-video src="#videoCR" position="-1.5 3 -5" width="2" height="1.12"></a-video>
+            <a-video src="#videoBR" position="1.5 3 -5" width="2" height="1.12"></a-video>
+
+            <a-image src="#imgA1" position="-2.25 5 -6" width="1" height="1"></a-image>
+            <a-image src="#imgA2" position="-0.75 5 -6" width="1" height="1"></a-image>
+            <a-image src="#imgA3" position="0.75 5 -6" width="1" height="1"></a-image>
+            <a-image src="#imgA4" position="2.25 5 -6" width="1" height="1"></a-image>
+        </a-entity>
+
+    </a-entity>
+
+    <a-entity camera id="myCamera" look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
-    const marker = document.querySelector("#hiroMarker");
+    const marker = document.querySelector("#markerRef");
+    const vrContent = document.querySelector("#vrContent");
+    const scaleNode = document.querySelector("#dynamicScaleNode");
+    const camera = document.querySelector("#myCamera");
+    
     const vCR = document.querySelector("#videoCR");
     const vBR = document.querySelector("#videoBR");
 
+    let isDetected = false;
+
     marker.addEventListener("markerFound", () => {
+      vrContent.setAttribute("visible", "true");
+      isDetected = true;
       vCR.play();
       vBR.play();
     });
 
-    marker.addEventListener("markerLost", () => {
-      vCR.pause();
-      vBR.pause();
-    });
+    // Boucle de rendu pour calculer la distance
+    function updateZoom() {
+      if (isDetected) {
+        // Récupérer les positions mondiales du marqueur et de la caméra
+        const markerPos = new THREE.Vector3();
+        marker.object3D.getWorldPosition(markerPos);
+
+        const cameraPos = new THREE.Vector3();
+        camera.object3D.getWorldPosition(cameraPos);
+
+        // Calculer la distance entre les deux
+        const distance = markerPos.distanceTo(cameraPos);
+
+        // FORMULE DE ZOOM : On ajuste l'échelle en fonction de la distance
+        // Si distance = 2 (proche), scale sera grand. Si distance = 10 (loin), scale sera petit.
+        // On utilise 2 / distance pour créer un effet inverse
+        let newScale = 2.5 / distance; 
+        
+        // Limites pour ne pas que ça devienne trop petit ou trop grand
+        newScale = Math.min(Math.max(newScale, 0.3), 2.0);
+
+        scaleNode.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
+      }
+      requestAnimationFrame(updateZoom);
+    }
+
+    updateZoom();
   </script>
 </body>
 </html>
