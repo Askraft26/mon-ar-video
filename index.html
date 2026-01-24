@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Frame VR Stabilisée</title>
+  <title>AR Interactive Individuelle</title>
   
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -13,9 +13,9 @@
 <body style="margin:0; overflow:hidden; background:#000;">
   
   <a-scene embedded
-           arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; smooth: true; smoothCount: 20; smoothTolerance: 0.01; smoothThreshold: 5;"
+           arjs="sourceType: webcam; debugUIEnabled: false; smooth: true; smoothCount: 15;"
            gesture-detector
-           renderer="antialias: true; logarithmicDepthBuffer: true; precision: medium;">
+           renderer="antialias: true; logarithmicDepthBuffer: true;">
     
     <a-assets>
       <img id="civ" src="civ.png">
@@ -30,31 +30,31 @@
 
     <a-marker preset="hiro" id="marker" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;">
       
-      <a-entity id="ar-world" rotation="-90 0 0">
-        
-        <a-video src="#videoCR" 
-                 class="clickable" 
-                 gesture-handler
-                 position="-1.5 1 0" width="2" height="1.12"
-                 onclick="toggleVideo('#videoCR')">
-        </a-video>
+      <a-video src="#videoCR" 
+               class="clickable" 
+               gesture-handler="rotationEnabled: true; scaleEnabled: true"
+               position="-1.5 0.5 0" 
+               rotation="-90 0 0"
+               width="2" height="1.12"
+               onclick="toggleVideo('#videoCR')">
+      </a-video>
 
-        <a-video src="#videoBR" 
-                 class="clickable" 
-                 gesture-handler
-                 position="1.5 1 0" width="2" height="1.12" 
-                 onclick="toggleVideo('#videoBR')">
-        </a-video>
+      <a-video src="#videoBR" 
+               class="clickable" 
+               gesture-handler="rotationEnabled: true; scaleEnabled: true"
+               position="1.5 0.5 0" 
+               rotation="-90 0 0"
+               width="2" height="1.12"
+               onclick="toggleVideo('#videoBR')">
+      </a-video>
 
-        <a-image src="#imgA1" position="-2 2.5 -1" width="1" height="1"></a-image>
-        <a-image src="#imgA2" position="-0.7 2.5 -1.2" width="1" height="1"></a-image>
-        <a-image src="#imgA3" position="0.7 2.5 -1.2" width="1" height="1"></a-image>
-        <a-image src="#imgA4" position="2 2.5 -1" width="1" height="1"></a-image>
+      <a-image src="#imgA1" class="clickable" gesture-handler position="-2 1.5 -1" rotation="-90 0 0"></a-image>
+      <a-image src="#imgA2" class="clickable" gesture-handler position="-0.7 1.5 -1" rotation="-90 0 0"></a-image>
+      <a-image src="#imgA3" class="clickable" gesture-handler position="0.7 1.5 -1" rotation="-90 0 0"></a-image>
+      <a-image src="#imgA4" class="clickable" gesture-handler position="2 1.5 -1" rotation="-90 0 0"></a-image>
 
-        <a-plane src="#civ" position="-2.5 0.5 0.5" rotation="0 30 0" width="1.5" height="1"></a-plane>
-        <a-plane src="#cv" position="2.5 1 0.5" rotation="0 -30 0" width="1.8" height="2.5"></a-plane>
-
-      </a-entity>
+      <a-plane src="#civ" class="clickable" gesture-handler position="-2.5 0.2 0.5" rotation="-90 0 0" width="1.5" height="1"></a-plane>
+      <a-plane src="#cv" class="clickable" gesture-handler position="2.5 0.2 0.5" rotation="-90 0 0" width="1.8" height="2.5"></a-plane>
 
     </a-marker>
 
@@ -66,13 +66,11 @@
     const vCR = document.querySelector("#videoCR");
     const vBR = document.querySelector("#videoBR");
 
-    // Déclenchement AR
     marker.addEventListener("markerFound", () => {
       vCR.play();
       vBR.play();
     });
 
-    // Interaction Doigt (YouTube style)
     function toggleVideo(id) {
       const v = document.querySelector(id);
       v.paused ? v.play() : v.pause();
