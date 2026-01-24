@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AR Hiro Stable Hybride</title>
-  <!-- A-Frame et AR.js -->
+  <title>AR Hiro avec Vidéos</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
@@ -14,48 +13,49 @@
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
            renderer="antialias: true;">
     
-    <!-- Préchargement des assets -->
     <a-assets>
       <img id="civ" src="civ.png">
       <img id="cv" src="CVDanielHoba.jpg">
+      
+      <video id="videoCR" src="cr.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      <video id="videoBR" src="br.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
     </a-assets>
 
-    <!-- Marqueur Hiro (uniquement pour déclenchement) -->
     <a-marker preset="hiro" emitevents="true"
               smooth="true" smoothCount="30" smoothTolerance="0.001" smoothThreshold="15">
       <a-box position="0 0.5 0" depth="0.2" height="0.2" width="0.2" color="#FFD700"></a-box>
     </a-marker>
 
-    <!-- Contenu VR/AR indépendant du marqueur -->
     <a-entity id="fixedContent" visible="false">
-      <!-- Image du drapeau -->
-      <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0"
-               width="1.5" height="1"
-               material="shader: flat; side: double;"></a-plane>
+      <a-plane src="#civ" position="-2 1.5 -3" rotation="0 0 0" width="1.5" height="1"></a-plane>
 
-      <!-- Image du CV -->
-      <a-plane src="#cv" position="2 1.5 -3" rotation="0 0 0"
-               width="2" height="3"
-               material="shader: flat; side: double;"></a-plane>
+      <a-plane src="#cv" position="2 1.5 -3" rotation="0 0 0" width="2" height="3"></a-plane>
+
+      <a-video src="#videoCR" position="0 3 -5" width="3.2" height="1.8"></a-video>
+
+      <a-video src="#videoBR" position="-3 3 -5" width="2" height="1.12"></a-video>
     </a-entity>
 
-    <!-- Caméra + contrôles -->
     <a-entity camera look-controls wasd-controls position="0 1.6 0"></a-entity>
   </a-scene>
 
   <script>
     const marker = document.querySelector("a-marker");
     const fixedContent = document.querySelector("#fixedContent");
+    const vCR = document.querySelector("#videoCR");
+    const vBR = document.querySelector("#videoBR");
 
     marker.addEventListener("markerFound", () => {
       console.log("Marqueur Hiro détecté ✅");
-      // Active le contenu une fois Hiro scanné
       fixedContent.setAttribute("visible", "true");
+      
+      // Lancement des vidéos (souvent bloqué par les navigateurs sans interaction utilisateur)
+      vCR.play().catch(e => console.log("Lecture CR en attente d'interaction"));
+      vBR.play().catch(e => console.log("Lecture BR en attente d'interaction"));
     });
 
     marker.addEventListener("markerLost", () => {
       console.log("Marqueur Hiro perdu ❌");
-      // Le contenu reste visible et stable
     });
   </script>
 </body>
