@@ -3,12 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Hiro - Zoom Interactif</title>
+  <title>AR Hiro - Zoom avec Boutons</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  
+  <style>
+    /* Style des boutons de zoom */
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 999; /* Pour rester au-dessus de la réalité augmentée */
+    }
+
+    .zoom-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 215, 0, 0.8); /* Couleur Or comme ta box */
+      color: black;
+      font-size: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .zoom-btn:active {
+      background: #cca300;
+      transform: scale(0.9);
+    }
+  </style>
 </head>
 
 <body style="margin:0; overflow:hidden; background:#111;">
+
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="btn-out">−</button>
+    <button class="zoom-btn" id="btn-in">+</button>
+  </div>
+
   <a-scene embedded
            arjs="sourceType: webcam; trackingMethod: best; detectionMode: mono_and_matrix; debugUIEnabled: false;"
            renderer="antialias: true;">
@@ -53,50 +95,35 @@
     const vCR = document.querySelector("#videoCR");
     const vBR = document.querySelector("#videoBR");
 
+    const btnIn = document.querySelector("#btn-in");
+    const btnOut = document.querySelector("#btn-out");
+
     marker.addEventListener("markerFound", () => {
       fixedContent.setAttribute("visible", "true");
       vCR.play();
       vBR.play();
     });
 
-    // --- LOGIQUE DE ZOOM ---
+    // --- LOGIQUE DE ZOOM PAR BOUTONS ---
     let zoomScale = 1;
+    const step = 0.2; // Vitesse du zoom
     const minZoom = 0.2;
     const maxZoom = 5;
 
-    // Zoom à la molette (PC)
-    window.addEventListener('wheel', (event) => {
-        zoomScale -= event.deltaY * 0.001;
-        applyZoom();
-    });
-
-    // Zoom tactile (Pinch to Zoom)
-    let lastDist = 0;
-    window.addEventListener('touchmove', (event) => {
-        if (event.touches.length === 2) {
-            let dist = Math.hypot(
-                event.touches[0].pageX - event.touches[1].pageX,
-                event.touches[0].pageY - event.touches[1].pageY
-            );
-            
-            if (lastDist > 0) {
-                if (dist > lastDist) zoomScale += 0.05; // Zoom
-                else zoomScale -= 0.05; // Dézoom
-                applyZoom();
-            }
-            lastDist = dist;
-        }
-    }, { passive: false });
-
-    window.addEventListener('touchend', () => {
-        lastDist = 0;
-    });
-
     function applyZoom() {
-        // Limitation du zoom pour éviter de perdre les objets
-        zoomScale = Math.min(Math.max(zoomScale, minZoom), maxZoom);
-        zoomContainer.setAttribute('scale', `${zoomScale} ${zoomScale} ${zoomScale}`);
+      zoomScale = Math.min(Math.max(zoomScale, minZoom), maxZoom);
+      zoomContainer.setAttribute('scale', `${zoomScale} ${zoomScale} ${zoomScale}`);
     }
+
+    btnIn.addEventListener("click", () => {
+      zoomScale += step;
+      applyZoom();
+    });
+
+    btnOut.addEventListener("click", () => {
+      zoomScale -= step;
+      applyZoom();
+    });
   </script>
 </body>
 </html>
