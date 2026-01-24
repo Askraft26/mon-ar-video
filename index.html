@@ -3,70 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Interactive - Touch Controls</title>
+  <title>AR Immersive & Interactive</title>
+  
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
 </head>
 
 <body style="margin:0; overflow:hidden; background:#000;">
+  
   <a-scene embedded
-           arjs="sourceType: webcam; debugUIEnabled: false; smooth: true; smoothCount: 10;"
+           arjs="sourceType: webcam; debugUIEnabled: false; smooth: true; smoothCount: 10; smoothTolerance: 0.01; smoothThreshold: 5;"
            gesture-detector
-           renderer="antialias: true; colorManagement: true;">
+           renderer="antialias: true; logarithmicDepthBuffer: true; colorManagement: true;">
     
     <a-assets>
       <img id="civ" src="civ.png">
       <img id="cv" src="CVDanielHoba.jpg">
+      <img id="imgA1" src="A1.jpg">
+      <img id="imgA2" src="A2.jpg">
       <img id="imgA3" src="A3.png"> 
+      <img id="imgA4" src="A4.jpg">
       <video id="videoCR" src="cr.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline></video>
       <video id="videoBR" src="br.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline></video>
     </a-assets>
 
-    <a-marker preset="hiro" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;">
-      
-      <a-entity id="videoContainer" position="0 1 0">
-        
-        <a-video src="#videoCR" 
-                 class="clickable"
-                 gesture-handler
-                 position="-1.2 0 0" 
-                 width="2" height="1.12"
-                 onclick="toggleVideo('#videoCR')">
-        </a-video>
-
-        <a-video src="#videoBR" 
-                 class="clickable"
-                 gesture-handler
-                 position="1.2 0 0" 
-                 width="2" height="1.12"
-                 onclick="toggleVideo('#videoBR')">
-        </a-video>
-
-      </a-entity>
-
+    <a-marker preset="hiro" id="marker" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;">
+       <a-ring color="#FFD700" rotation="-90 0 0" radius-inner="0.04" radius-outer="0.06"></a-ring>
     </a-marker>
+
+    <a-entity id="fixedContent" visible="false">
+      
+      <a-plane src="#civ" position="-2 1 -3" width="1.5" height="1"></a-plane>
+      <a-plane src="#cv" position="2 1 -3" width="2" height="3"></a-plane>
+
+      <a-video src="#videoCR" 
+               class="clickable" 
+               gesture-handler
+               position="-1.5 3 -4" width="2" height="1.12"
+               onclick="toggleVideo('#videoCR')">
+      </a-video>
+
+      <a-video src="#videoBR" 
+               class="clickable" 
+               gesture-handler
+               position="1.5 3 -4" width="2" height="1.12" 
+               onclick="toggleVideo('#videoBR')">
+      </a-video>
+
+      <a-image src="#imgA1" position="-2.25 5 -5" width="1" height="1"></a-image>
+      <a-image src="#imgA2" position="-0.75 5 -5" width="1" height="1"></a-image>
+      <a-image src="#imgA3" position="0.75 5 -5" width="1" height="1"></a-image>
+      <a-image src="#imgA4" position="2.25 5 -5" width="1" height="1"></a-image>
+
+    </a-entity>
 
     <a-entity camera></a-entity>
   </a-scene>
 
   <script>
-    // Fonction simple pour Play/Pause au clic (comme sur YouTube/FB)
+    const marker = document.querySelector("#marker");
+    const fixedContent = document.querySelector("#fixedContent");
+    const vCR = document.querySelector("#videoCR");
+    const vBR = document.querySelector("#videoBR");
+
+    // Quand le marqueur est détecté
+    marker.addEventListener("markerFound", () => {
+      fixedContent.setAttribute("visible", "true");
+      vCR.play();
+      vBR.play();
+    });
+
+    // Fonction Play/Pause au toucher
     function toggleVideo(id) {
       const v = document.querySelector(id);
-      if (v.paused) {
-        v.play();
-      } else {
-        v.pause();
-      }
+      v.paused ? v.play() : v.pause();
     }
-
-    // Gestion de l'apparition
-    const marker = document.querySelector("a-marker");
-    marker.addEventListener("markerFound", () => {
-      document.querySelector("#videoCR").play();
-      document.querySelector("#videoBR").play();
-    });
   </script>
 </body>
 </html>
