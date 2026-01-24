@@ -3,43 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Hiro - Zoom avec Boutons</title>
+  <title>AR Hiro - Zoom en Profondeur</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   
   <style>
-    /* Style des boutons de zoom */
     .zoom-controls {
       position: fixed;
-      bottom: 20px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 20px;
-      z-index: 999; /* Pour rester au-dessus de la réalité augmentée */
+      gap: 25px;
+      z-index: 1000;
     }
 
     .zoom-btn {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
       border-radius: 50%;
-      border: none;
-      background: rgba(255, 215, 0, 0.8); /* Couleur Or comme ta box */
-      color: black;
-      font-size: 30px;
-      font-weight: bold;
+      border: 3px solid white;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 35px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
 
     .zoom-btn:active {
-      background: #cca300;
-      transform: scale(0.9);
+      background: rgba(255, 215, 0, 0.8);
+      color: black;
     }
   </style>
 </head>
@@ -47,8 +43,8 @@
 <body style="margin:0; overflow:hidden; background:#111;">
 
   <div class="zoom-controls">
-    <button class="zoom-btn" id="btn-out">−</button>
-    <button class="zoom-btn" id="btn-in">+</button>
+    <button class="zoom-btn" id="btn-far" title="S'éloigner">◀</button>
+    <button class="zoom-btn" id="btn-near" title="Se rapprocher">▶</button>
   </div>
 
   <a-scene embedded
@@ -70,7 +66,7 @@
       <a-box position="0 0.5 0" scale="0.2 0.2 0.2" color="#FFD700"></a-box>
     </a-marker>
 
-    <a-entity id="zoomContainer" scale="1 1 1">
+    <a-entity id="mainContainer" position="0 0 0">
         <a-entity id="fixedContent" visible="false">
           <a-plane src="#civ" position="-2 1 -3" width="1.5" height="1"></a-plane>
           <a-plane src="#cv" position="2 1 -3" width="2" height="3"></a-plane>
@@ -91,12 +87,12 @@
   <script>
     const marker = document.querySelector("a-marker");
     const fixedContent = document.querySelector("#fixedContent");
-    const zoomContainer = document.querySelector("#zoomContainer");
+    const mainContainer = document.querySelector("#mainContainer");
     const vCR = document.querySelector("#videoCR");
     const vBR = document.querySelector("#videoBR");
 
-    const btnIn = document.querySelector("#btn-in");
-    const btnOut = document.querySelector("#btn-out");
+    const btnNear = document.querySelector("#btn-near");
+    const btnFar = document.querySelector("#btn-far");
 
     marker.addEventListener("markerFound", () => {
       fixedContent.setAttribute("visible", "true");
@@ -104,26 +100,24 @@
       vBR.play();
     });
 
-    // --- LOGIQUE DE ZOOM PAR BOUTONS ---
-    let zoomScale = 1;
-    const step = 0.2; // Vitesse du zoom
-    const minZoom = 0.2;
-    const maxZoom = 5;
+    // --- LOGIQUE DE POSITION (ZOOM PROFONDEUR) ---
+    let currentZ = 0; 
+    const step = 0.5; // Distance de déplacement à chaque clic
 
-    function applyZoom() {
-      zoomScale = Math.min(Math.max(zoomScale, minZoom), maxZoom);
-      zoomContainer.setAttribute('scale', `${zoomScale} ${zoomScale} ${zoomScale}`);
+    btnNear.addEventListener("click", () => {
+      currentZ += step; // Rapproche de la caméra
+      updatePosition();
+    });
+
+    btnFar.addEventListener("click", () => {
+      currentZ -= step; // Éloigne de la caméra
+      updatePosition();
+    });
+
+    function updatePosition() {
+      // On met à jour la position X Y Z (seul Z change ici)
+      mainContainer.setAttribute('position', `0 0 ${currentZ}`);
     }
-
-    btnIn.addEventListener("click", () => {
-      zoomScale += step;
-      applyZoom();
-    });
-
-    btnOut.addEventListener("click", () => {
-      zoomScale -= step;
-      applyZoom();
-    });
   </script>
 </body>
 </html>
