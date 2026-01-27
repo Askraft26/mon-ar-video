@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>AR Interactive Pro - Centré VR</title>
+  <title>AR Interactive Pro - VR Indépendante</title>
   
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -21,11 +21,19 @@
       border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;
     }
     
-    /* Ajout d'un overlay spécifique pour le mode VR centré */
+    /* Ajout d'un overlay spécifique pour le mode VR indépendant */
     #vrModeOverlay {
       position: absolute; z-index: 998; top: 10px; left: 10px;
       background: rgba(0,0,0,0.7); color: white; padding: 10px;
       border-radius: 5px; display: none; font-size: 12px;
+    }
+    
+    /* Style pour les boutons de contrôle VR */
+    .vr-control-btn {
+      position: absolute; z-index: 997; background: rgba(0,0,0,0.7);
+      color: white; border: 2px solid #1565C0; border-radius: 50%;
+      width: 60px; height: 60px; display: none; justify-content: center;
+      align-items: center; font-size: 24px; cursor: pointer;
     }
   </style>
 </head>
@@ -33,15 +41,19 @@
 <body style="margin:0; overflow:hidden;">
 
   <div id="overlay">
-    <h2>Expérience AR</h2>
-    <p>Veuillez autoriser la caméra</p>
+    <h2>Expérience AR/VR</h2>
+    <p>Scannez le marqueur Hiro pour activer la VR indépendante</p>
     <button id="startBtn">COMMENCER L'EXPÉRIENCE</button>
   </div>
 
-  <!-- Overlay pour indiquer le mode VR centré -->
+  <!-- Overlay pour indiquer le mode VR indépendant -->
   <div id="vrModeOverlay">
-    Mode VR centré activé<br>Le contenu suit le marqueur
+    🚀 VR INDÉPENDANTE ACTIVÉE<br>Le contenu est maintenant autonome
   </div>
+
+  <!-- Boutons de contrôle pour la VR indépendante -->
+  <button id="resetVRBtn" class="vr-control-btn" style="top: 80px; left: 10px;">↻</button>
+  <button id="vrEffectsBtn" class="vr-control-btn" style="top: 150px; left: 10px;">✨</button>
 
   <a-scene 
     embedded 
@@ -60,72 +72,111 @@
       
       <video id="videoCR" src="cr.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
       <video id="videoBR" src="br.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      
+      <!-- Textures pour effets VR -->
+      <img id="gridTexture" src="https://cdn.aframe.io/a-painter/images/grid.png" crossorigin="anonymous">
     </a-assets>
 
-    <!-- MARQUEUR HIRO À LA RACINE (comme avant) -->
+    <!-- MARQUEUR HIRO À LA RACINE -->
     <a-marker preset="hiro" id="marker" raycaster="objects: .clickable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;" markerhandler>
-
-      <!-- Feedback visuel léger du marqueur (optionnel) -->
+      <!-- Feedback visuel minimal pour le marqueur -->
       <a-ring color="#1565C0" radius-inner="0.05" radius-outer="0.08" rotation="-90 0 0" 
-              opacity="0.5" animation="property: scale; to: 1.3 1.3 1.3; dur: 1500; dir: alternate; loop: true"></a-ring>
-      
-      <!-- LE CONTENU ORIGINAL RESTE ICI pour compatibilité -->
-      <a-entity id="originalContent">
-        <a-entity position="-1.5 0 0">
-          <a-video src="#videoCR" class="clickable video-control"
-                   position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
-                   gesture-handler></a-video>
-          <a-text value="Toucher pour Play/Pause" position="0 0.1 -0.7" rotation="-90 0 0" align="center" width="2"></a-text>
-
-          <a-image src="#imgA1" class="clickable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-          <a-image src="#imgA2" class="clickable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-          
-          <a-plane src="#civ" class="clickable" gesture-handler position="-1 0.1 1" rotation="-90 0 0" width="1.5" height="1"></a-plane>
-        </a-entity>
-
-        <a-entity position="1.5 0 0">
-          <a-video src="#videoBR" class="clickable video-control"
-                   position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
-                   gesture-handler></a-video>
-          
-          <a-image src="#imgA3" class="clickable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-          <a-image src="#imgA4" class="clickable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-
-          <a-plane src="#cv" class="clickable" gesture-handler position="1 0.1 1" rotation="-90 0 0" width="1.5" height="2"></a-plane>
-        </a-entity>
-      </a-entity>
-
+              opacity="0.3" animation="property: scale; to: 1.2 1.2 1.2; dur: 1200; dir: alternate; loop: true"></a-ring>
     </a-marker>
 
-    <!-- CONTENEUR VR SÉPARÉ pour le mode centré -->
-    <a-entity id="vrCenteredContainer" visible="false" scale="0.01 0.01 0.01">
-      <!-- Copie du contenu pour le mode VR centré -->
-      <a-entity position="-1.5 0 0">
-        <a-video src="#videoCR" class="clickable video-control"
-                 position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
-                 gesture-handler></a-video>
-        <a-text value="Toucher pour Play/Pause" position="0 0.1 -0.7" rotation="-90 0 0" align="center" width="2"></a-text>
+    <!-- CONTENEUR VR INDÉPENDANT (caché initialement) -->
+    <a-entity id="independentVRContainer" visible="false" position="0 0 -3" scale="0.01 0.01 0.01">
+      <!-- Environnement VR (ciel et sol) -->
+      <a-sky id="vrSky" color="#000011" visible="true"></a-sky>
+      <a-circle id="vrGround" radius="10" rotation="-90 0 0" position="0 0 0" color="#111122" opacity="0.8" 
+                material="src: #gridTexture; repeat: 20 20;"></a-circle>
+      
+      <!-- Contenu principal VR avec animations indépendantes -->
+      <a-entity id="vrContentGroup" position="0 0 0">
+        <!-- Panneau gauche avec animations VR spécifiques -->
+        <a-entity id="vrLeftPanel" position="-1.5 0.8 0" 
+                  animation__float="property: position; to: -1.5 1 0; dir: alternate; dur: 3000; easing: easeInOutSine; loop: true"
+                  animation__rotate="property: rotation; to: 0 5 0; dir: alternate; dur: 4000; easing: easeInOutSine; loop: true">
+          
+          <a-video src="#videoCR" class="clickable video-control vr-element"
+                   position="0 0 0" width="2" height="1.12"
+                   animation__pulse="property: scale; to: 1.05 1.05 1.05; dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; startEvents: mouseenter; pauseEvents: mouseleave">
+          </a-video>
+          
+          <a-text value="VIDÉO 1 - VR" position="0 -0.7 0" align="center" width="3" 
+                  color="#1565C0" font="roboto"
+                  animation__color="property: color; to: #4FC3F7; dir: alternate; dur: 2000; loop: true"></a-text>
 
-        <a-image src="#imgA1" class="clickable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-        <a-image src="#imgA2" class="clickable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
+          <a-entity position="-0.5 -1.2 0" 
+                    animation__float2="property: position; to: -0.5 -1 0; dir: alternate; dur: 2500; delay: 500; loop: true">
+            <a-image src="#imgA1" class="clickable vr-element" width="1" height="1"
+                     animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 500; easing: easeOutElastic; startEvents: mouseenter"></a-image>
+          </a-entity>
+          
+          <a-entity position="0.5 -1.2 0"
+                    animation__float3="property: position; to: 0.5 -1 0; dir: alternate; dur: 2500; delay: 1000; loop: true">
+            <a-image src="#imgA2" class="clickable vr-element" width="1" height="1"
+                     animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 500; easing: easeOutElastic; startEvents: mouseenter"></a-image>
+          </a-entity>
+          
+          <a-entity position="0 -1.8 0" rotation="0 180 0"
+                    animation__float4="property: position; to: 0 -1.6 0; dir: alternate; dur: 3000; delay: 1500; loop: true">
+            <a-plane src="#civ" class="clickable vr-element" width="1.5" height="1"
+                     animation__rotate2="property: rotation; to: 0 360 0; dur: 10000; loop: true"></a-plane>
+          </a-entity>
+        </a-entity>
+
+        <!-- Panneau droit avec animations VR spécifiques -->
+        <a-entity id="vrRightPanel" position="1.5 0.8 0"
+                  animation__float="property: position; to: 1.5 1 0; dir: alternate; dur: 3000; delay: 1000; easing: easeInOutSine; loop: true"
+                  animation__rotate="property: rotation; to: 0 -5 0; dir: alternate; dur: 4000; easing: easeInOutSine; loop: true">
+          
+          <a-video src="#videoBR" class="clickable video-control vr-element"
+                   position="0 0 0" width="2" height="1.12"
+                   animation__pulse="property: scale; to: 1.05 1.05 1.05; dir: alternate; dur: 2000; delay: 1000; easing: easeInOutSine; loop: true; startEvents: mouseenter; pauseEvents: mouseleave">
+          </a-video>
+          
+          <a-text value="VIDÉO 2 - VR" position="0 -0.7 0" align="center" width="3" 
+                  color="#1565C0" font="roboto"
+                  animation__color="property: color; to: #4FC3F7; dir: alternate; dur: 2000; delay: 1000; loop: true"></a-text>
+          
+          <a-entity position="-0.5 -1.2 0"
+                    animation__float2="property: position; to: -0.5 -1 0; dir: alternate; dur: 2500; delay: 500; loop: true">
+            <a-image src="#imgA3" class="clickable vr-element" width="1" height="1"
+                     animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 500; easing: easeOutElastic; startEvents: mouseenter"></a-image>
+          </a-entity>
+          
+          <a-entity position="0.5 -1.2 0"
+                    animation__float3="property: position; to: 0.5 -1 0; dir: alternate; dur: 2500; delay: 1000; loop: true">
+            <a-image src="#imgA4" class="clickable vr-element" width="1" height="1"
+                     animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 500; easing: easeOutElastic; startEvents: mouseenter"></a-image>
+          </a-entity>
+          
+          <a-entity position="0 -1.8 0" rotation="0 0 0"
+                    animation__float4="property: position; to: 0 -1.6 0; dir: alternate; dur: 3000; delay: 1500; loop: true">
+            <a-plane src="#cv" class="clickable vr-element" width="1.5" height="2"
+                     animation__rotate2="property: rotation; to: 0 360 0; dur: 15000; loop: true; easing: linear"></a-plane>
+          </a-entity>
+        </a-entity>
         
-        <a-plane src="#civ" class="clickable" gesture-handler position="-1 0.1 1" rotation="-90 0 0" width="1.5" height="1"></a-plane>
-      </a-entity>
-
-      <a-entity position="1.5 0 0">
-        <a-video src="#videoBR" class="clickable video-control"
-                 position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
-                 gesture-handler></a-video>
+        <!-- Éléments décoratifs VR -->
+        <a-entity id="vrStars">
+          <!-- Particules/étoiles pour effet spatial -->
+          <a-entity geometry="primitive: sphere" material="color: #FFFFFF; shader: flat" scale="0.05 0.05 0.05" position="-3 2 -5"></a-entity>
+          <a-entity geometry="primitive: sphere" material="color: #FFFFFF; shader: flat" scale="0.03 0.03 0.03" position="2 1.5 -4"></a-entity>
+          <a-entity geometry="primitive: sphere" material="color: #4FC3F7; shader: flat" scale="0.04 0.04 0.04" position="-1 2.5 -3"></a-entity>
+        </a-entity>
         
-        <a-image src="#imgA3" class="clickable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-        <a-image src="#imgA4" class="clickable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-
-        <a-plane src="#cv" class="clickable" gesture-handler position="1 0.1 1" rotation="-90 0 0" width="1.5" height="2"></a-plane>
+        <!-- Bouton de fermeture VR -->
+        <a-entity id="vrCloseBtn" class="clickable vr-element" position="0 -2.5 0" visible="true">
+          <a-circle radius="0.2" color="#FF5252"></a-circle>
+          <a-text value="X" align="center" width="2" position="0 0 0.01" color="white"></a-text>
+        </a-entity>
       </a-entity>
     </a-entity>
 
     <a-entity camera>
-      <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
+      <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable, .vr-element"></a-entity>
     </a-entity>
 
   </a-scene>
@@ -136,11 +187,17 @@
     const startBtn = document.getElementById('startBtn');
     const videos = document.querySelectorAll('video');
     const vrModeOverlay = document.getElementById('vrModeOverlay');
+    const resetVRBtn = document.getElementById('resetVRBtn');
+    const vrEffectsBtn = document.getElementById('vrEffectsBtn');
     
-    // Variables pour le mode VR
-    let vrModeActive = false;
-    const originalContent = document.querySelector('#originalContent');
-    const vrContainer = document.querySelector('#vrCenteredContainer');
+    // Variables pour la VR indépendante
+    let vrIndependentActive = false;
+    const vrContainer = document.querySelector('#independentVRContainer');
+    const vrContentGroup = document.querySelector('#vrContentGroup');
+    const vrSky = document.querySelector('#vrSky');
+    const vrGround = document.querySelector('#vrGround');
+    const vrStars = document.querySelector('#vrStars');
+    let vrEffectsEnabled = true;
 
     startBtn.addEventListener('click', () => {
       overlay.style.display = 'none';
@@ -151,84 +208,91 @@
       });
     });
 
-    // 2. COMPOSANT POUR GÉRER LE MARQUEUR (PERDU/TROUVÉ)
+    // 2. COMPOSANT POUR GÉRER LE MARQUEUR (ACTIVATION VR INDÉPENDANTE)
     AFRAME.registerComponent('markerhandler', {
       init: function () {
         const marker = this.el;
+        let vrActivated = false;
         
         marker.addEventListener('markerFound', () => {
-          console.log("Marqueur Hiro trouvé");
+          console.log("Marqueur Hiro trouvé - Activation VR indépendante");
           
-          // ACTIVER LE MODE VR CENTRÉ
-          if (!vrModeActive) {
-            vrModeActive = true;
+          // ACTIVER LA VR INDÉPENDANTE (une seule fois)
+          if (!vrIndependentActive && !vrActivated) {
+            vrActivated = true;
+            vrIndependentActive = true;
+            
+            // Afficher les indicateurs et contrôles VR
             vrModeOverlay.style.display = 'block';
+            resetVRBtn.style.display = 'flex';
+            vrEffectsBtn.style.display = 'flex';
             
-            // Cacher le contenu original (attaché au marqueur)
-            originalContent.setAttribute("visible", "false");
+            // Positionner la VR devant l'utilisateur
+            const camera = document.querySelector('[camera]').object3D;
+            const cameraWorldPos = new THREE.Vector3();
+            camera.getWorldPosition(cameraWorldPos);
             
-            // Récupérer la position mondiale du marqueur
-            const worldPos = new THREE.Vector3();
-            marker.object3D.getWorldPosition(worldPos);
+            // Calculer la direction de la caméra
+            const cameraDirection = new THREE.Vector3();
+            camera.getWorldDirection(cameraDirection);
             
-            // Placer le conteneur VR à la position du marqueur
-            vrContainer.object3D.position.set(worldPos.x, worldPos.y, worldPos.z);
+            // Positionner le contenu VR à 3m devant la caméra
+            const vrPosition = new THREE.Vector3()
+              .copy(cameraWorldPos)
+              .add(cameraDirection.multiplyScalar(3));
             
-            // Rendre visible et animer l'échelle
+            vrContainer.object3D.position.set(vrPosition.x, vrPosition.y, vrPosition.z);
+            
+            // Orientation : regarder vers la caméra
+            vrContainer.object3D.lookAt(cameraWorldPos);
+            
+            // Animation d'apparition spectaculaire
             vrContainer.setAttribute("visible", "true");
-            vrContainer.setAttribute("animation", {
+            vrContainer.setAttribute("animation__scale", {
               property: 'scale',
               to: '1 1 1',
-              dur: 800,
-              easing: 'easeOutBack'
+              dur: 1500,
+              easing: 'easeOutElastic'
             });
-          } else {
-            // Mettre à jour la position en continu si on veut que ça suive
-            const worldPos = new THREE.Vector3();
-            marker.object3D.getWorldPosition(worldPos);
-            vrContainer.object3D.position.set(worldPos.x, worldPos.y, worldPos.z);
+            
+            vrContainer.setAttribute("animation__opacity", {
+              property: 'material.opacity',
+              from: 0,
+              to: 1,
+              dur: 1000,
+              delay: 500
+            });
+            
+            // Démarrer les vidéos automatiquement en VR
+            setTimeout(() => {
+              document.querySelector('#videoCR').play();
+              document.querySelector('#videoBR').play();
+            }, 1000);
+            
+            console.log("VR indépendante activée - Le contenu est maintenant autonome");
           }
-          
-          // Lancer automatiquement les vidéos si désiré
-          // document.querySelector('#videoCR').play();
-          // document.querySelector('#videoBR').play();
         });
 
         marker.addEventListener('markerLost', () => {
           console.log("Marqueur Hiro perdu");
           
-          if (vrModeActive) {
-            // Cacher l'indicateur VR
-            vrModeOverlay.style.display = 'none';
-            
-            // Animer la disparition
-            vrContainer.setAttribute("animation", {
-              property: 'scale',
-              to: '0.01 0.01 0.01',
-              dur: 500,
-              easing: 'easeInBack'
-            });
-            
-            // Après l'animation, cacher le conteneur
-            setTimeout(() => {
-              vrContainer.setAttribute("visible", "false");
-              vrModeActive = false;
-              
-              // Réafficher le contenu original (pour le cas où on revient au mode AR normal)
-              originalContent.setAttribute("visible", "true");
-            }, 500);
+          // IMPORTANT: En mode VR indépendant, on ne fait RIEN quand le marqueur est perdu
+          // Le contenu VR reste actif et visible
+          if (!vrIndependentActive) {
+            // Seulement si la VR n'est pas active, on peut mettre en pause les vidéos
+            videos.forEach(v => v.pause());
           }
-          
-          // PAUSE TOUTES LES VIDÉOS pour économiser la batterie
-          videos.forEach(v => v.pause());
         });
       }
     });
 
-    // 3. LOGIQUE CLICK VIDÉO (PLAY/PAUSE INDIVIDUEL) - FONCTIONNE POUR LES DEUX VERSIONS
-    document.querySelectorAll('.video-control').forEach(entity => {
-      entity.addEventListener('click', function () {
-        const videoId = this.getAttribute('src'); 
+    // 3. LOGIQUE CLICK VIDÉO (PLAY/PAUSE) POUR LES ÉLÉMENTS VR
+    document.addEventListener('click', function (evt) {
+      const target = evt.target;
+      
+      // Vérifier si on a cliqué sur un élément vidéo VR
+      if (target.classList && target.classList.contains('video-control')) {
+        const videoId = target.getAttribute('src'); 
         const videoEl = document.querySelector(videoId);
         
         if (videoEl) {
@@ -238,41 +302,188 @@
             videoEl.pause();
           }
         }
+      }
+    });
+
+    // 4. BOUTON DE RÉINITIALISATION VR
+    resetVRBtn.addEventListener('click', () => {
+      if (vrIndependentActive) {
+        // Réinitialiser la position VR devant la caméra
+        const camera = document.querySelector('[camera]').object3D;
+        const cameraWorldPos = new THREE.Vector3();
+        camera.getWorldPosition(cameraWorldPos);
+        
+        const cameraDirection = new THREE.Vector3();
+        camera.getWorldDirection(cameraDirection);
+        
+        const vrPosition = new THREE.Vector3()
+          .copy(cameraWorldPos)
+          .add(cameraDirection.multiplyScalar(3));
+        
+        vrContainer.object3D.position.set(vrPosition.x, vrPosition.y, vrPosition.z);
+        vrContainer.object3D.lookAt(cameraWorldPos);
+        
+        // Effet visuel de réinitialisation
+        vrContainer.setAttribute("animation__pulse", {
+          property: 'scale',
+          to: '1.1 1.1 1.1',
+          dir: 'alternate',
+          dur: 500,
+          easing: 'easeOutElastic'
+        });
+        
+        console.log("Position VR réinitialisée");
+      }
+    });
+
+    // 5. BOUTON D'EFFETS VR
+    vrEffectsBtn.addEventListener('click', () => {
+      if (vrIndependentActive) {
+        vrEffectsEnabled = !vrEffectsEnabled;
+        
+        if (vrEffectsEnabled) {
+          // Activer les effets
+          vrSky.setAttribute("visible", "true");
+          vrGround.setAttribute("visible", "true");
+          vrStars.setAttribute("visible", "true");
+          
+          // Animation de transition
+          vrSky.setAttribute("animation__color", {
+            property: 'color',
+            to: '#000033',
+            dur: 1000,
+            easing: 'easeInOutSine'
+          });
+          
+          vrEffectsBtn.textContent = "✨";
+          vrEffectsBtn.style.borderColor = "#4FC3F7";
+        } else {
+          // Désactiver les effets
+          vrSky.setAttribute("visible", "false");
+          vrGround.setAttribute("visible", "false");
+          vrStars.setAttribute("visible", "false");
+          
+          vrEffectsBtn.textContent = "🌌";
+          vrEffectsBtn.style.borderColor = "#1565C0";
+        }
+      }
+    });
+
+    // 6. BOUTON DE FERMETURE VR (dans la scène)
+    document.querySelector('#vrCloseBtn').addEventListener('click', function() {
+      if (vrIndependentActive) {
+        // Animation de disparition
+        vrContainer.setAttribute("animation__scale", {
+          property: 'scale',
+          to: '0.01 0.01 0.01',
+          dur: 800,
+          easing: 'easeInBack'
+        });
+        
+        vrContainer.setAttribute("animation__opacity", {
+          property: 'material.opacity',
+          to: 0,
+          dur: 500
+        });
+        
+        // Cacher après l'animation
+        setTimeout(() => {
+          vrContainer.setAttribute("visible", "false");
+          vrIndependentActive = false;
+          vrModeOverlay.style.display = 'none';
+          resetVRBtn.style.display = 'none';
+          vrEffectsBtn.style.display = 'none';
+          
+          // Mettre en pause les vidéos
+          videos.forEach(v => v.pause());
+          
+          console.log("VR indépendante désactivée");
+        }, 800);
+      }
+    });
+
+    // 7. INTERACTIONS AVEC LA SOURIS POUR LES ÉLÉMENTS VR
+    document.querySelectorAll('.vr-element').forEach(element => {
+      // Effet au survol
+      element.addEventListener('mouseenter', function() {
+        if (!this.hasAttribute('animation__hover')) {
+          this.setAttribute("animation__hover", {
+            property: 'scale',
+            to: '1.05 1.05 1.05',
+            dur: 300,
+            easing: 'easeOutElastic'
+          });
+        }
+      });
+      
+      element.addEventListener('mouseleave', function() {
+        if (this.hasAttribute('animation__hover')) {
+          this.setAttribute("animation__hover", {
+            property: 'scale',
+            to: '1 1 1',
+            dur: 300,
+            easing: 'easeOutElastic'
+          });
+        }
       });
     });
 
-    // 4. FONCTION POUR BASCHULER ENTRE MODE AR ET MODE VR (optionnel)
-    function toggleVRMode() {
-      if (vrModeActive) {
-        // Désactiver VR, revenir à AR normal
-        vrModeOverlay.style.display = 'none';
-        vrContainer.setAttribute("visible", "false");
-        originalContent.setAttribute("visible", "true");
-        vrModeActive = false;
-        console.log("Mode AR normal activé");
-      } else {
-        // Activer VR centré
-        const marker = document.querySelector('#marker');
-        if (marker.object3D.visible) {
-          const worldPos = new THREE.Vector3();
-          marker.object3D.getWorldPosition(worldPos);
-          vrContainer.object3D.position.set(worldPos.x, worldPos.y, worldPos.z);
-          vrContainer.setAttribute("visible", "true");
-          vrContainer.setAttribute("scale", "1 1 1");
-          originalContent.setAttribute("visible", "false");
-          vrModeOverlay.style.display = 'block';
-          vrModeActive = true;
-          console.log("Mode VR centré activé");
-        }
+    // 8. ANIMATION CONTINUE POUR LE CONTENU VR
+    function animateVRContent() {
+      if (vrIndependentActive) {
+        // Faire tourner lentement l'ensemble du contenu VR
+        const rotation = vrContentGroup.getAttribute('rotation') || {x: 0, y: 0, z: 0};
+        const newRotation = {
+          x: rotation.x,
+          y: rotation.y + 0.1,
+          z: rotation.z
+        };
+        vrContentGroup.setAttribute('rotation', newRotation);
       }
+      
+      requestAnimationFrame(animateVRContent);
     }
+    
+    // Démarrer l'animation
+    animateVRContent();
 
-    // Exemple: basculer avec la touche 'V'
-    document.addEventListener('keypress', (e) => {
-      if (e.key === 'v' || e.key === 'V') {
-        toggleVRMode();
+    // 9. GESTION DES TOUCHES CLAVIER POUR LA VR
+    document.addEventListener('keydown', (e) => {
+      if (!vrIndependentActive) return;
+      
+      const vrPos = vrContainer.object3D.position;
+      const moveSpeed = 0.2;
+      const rotateSpeed = 5;
+      
+      switch(e.key) {
+        case 'ArrowUp':
+          vrContainer.object3D.position.set(vrPos.x, vrPos.y + moveSpeed, vrPos.z);
+          break;
+        case 'ArrowDown':
+          vrContainer.object3D.position.set(vrPos.x, vrPos.y - moveSpeed, vrPos.z);
+          break;
+        case 'ArrowLeft':
+          vrContainer.object3D.position.set(vrPos.x - moveSpeed, vrPos.y, vrPos.z);
+          break;
+        case 'ArrowRight':
+          vrContainer.object3D.position.set(vrPos.x + moveSpeed, vrPos.y, vrPos.z);
+          break;
+        case '+':
+          vrContainer.object3D.scale.multiplyScalar(1.1);
+          break;
+        case '-':
+          vrContainer.object3D.scale.multiplyScalar(0.9);
+          break;
+        case 'r':
+        case 'R':
+          // Rotation manuelle
+          const rot = vrContainer.object3D.rotation;
+          vrContainer.object3D.rotation.set(rot.x, rot.y + rotateSpeed * Math.PI/180, rot.z);
+          break;
       }
     });
+
+    console.log("Système VR indépendant chargé - Scannez le marqueur Hiro pour activer");
   </script>
 </body>
 </html>
