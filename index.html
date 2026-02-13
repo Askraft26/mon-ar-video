@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>XR Environment - AR avec VR Intégrée</title>
+  <title>XR Environment - AR avec VR intégrée (corrigé)</title>
   
+  <!-- A-Frame stable -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- AR.js avec gestes -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+  <!-- Système de particules -->
   <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>
-
+  
   <style>
-    /* Écran d'accueil pour forcer l'interaction utilisateur */
+    /* Écran d'accueil */
     #overlay {
       position: absolute; z-index: 999; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center;
@@ -24,7 +27,7 @@
     }
     #startBtn:hover { transform: scale(1.05); }
     
-    /* HUD pour contrôle XR */
+    /* HUD XR */
     #xrHUD {
       position: absolute; z-index: 998; top: 10px; left: 10px;
       background: rgba(0,0,0,0.7); color: white; padding: 10px;
@@ -32,7 +35,7 @@
       border: 1px solid #4FC3F7;
     }
     
-    /* Boutons de contrôle XR */
+    /* Boutons de contrôle */
     .xr-btn {
       position: absolute; z-index: 997; background: rgba(0,0,0,0.8);
       color: white; border: 2px solid #4FC3F7; border-radius: 50%;
@@ -49,14 +52,15 @@
       border-radius: 15px; display: none; font-size: 11px;
     }
     
-    /* Portal pour accéder à la VR */
+    /* PORTAL OVERLAY - désormais cliquable */
     #portalOverlay {
       position: absolute; z-index: 995; top: 50%; left: 50%;
       transform: translate(-50%, -50%); width: 300px; height: 300px;
       background: radial-gradient(circle, rgba(79,195,247,0.1) 0%, rgba(21,101,192,0.5) 100%);
       border: 2px solid #4FC3F7; border-radius: 50%; display: none;
       animation: portalPulse 3s infinite;
-      pointer-events: none;
+      pointer-events: auto;   /* ← rend le clic possible */
+      cursor: pointer;
     }
     @keyframes portalPulse {
       0% { box-shadow: 0 0 20px rgba(79,195,247,0.5); }
@@ -65,195 +69,144 @@
     }
   </style>
 </head>
-
 <body style="margin:0; overflow:hidden;">
 
+  <!-- Écran de démarrage -->
   <div id="overlay">
-    <h2>XR Environment</h2>
-    <p>Scannez le marqueur Hiro pour entrer dans l'environnement AR</p>
-    <p>Découvrez ensuite le portail vers la VR</p>
+    <h2>XR Environment (corrigé)</h2>
+    <p>Scannez le marqueur Hiro pour entrer en AR</p>
+    <p>Cliquez ensuite sur le portail lumineux pour basculer en VR</p>
     <button id="startBtn">ENTRER EN XR</button>
   </div>
 
-  <!-- HUD XR -->
-  <div id="xrHUD">
-    <strong>XR ENVIRONMENT</strong><br>
-    Mode: <span id="currentMode">AR</span>
-  </div>
-
-  <!-- Boutons de contrôle XR -->
+  <!-- Interface XR -->
+  <div id="xrHUD"><strong>XR ENVIRONMENT</strong><br>Mode: <span id="currentMode">AR</span></div>
   <button id="resetBtn" class="xr-btn" style="top: 80px; left: 10px;" title="Réinitialiser">↻</button>
   <button id="modeBtn" class="xr-btn" style="top: 140px; left: 10px;" title="Changer de mode">🔄</button>
   <button id="effectsBtn" class="xr-btn" style="top: 200px; left: 10px;" title="Effets">✨</button>
-
-  <!-- Indicateur de mode -->
-  <div id="modeIndicator">
-    <span id="modeText">AR ENVIRONMENT</span>
-  </div>
-
-  <!-- Portal vers la VR -->
+  <div id="modeIndicator"><span id="modeText">AR ENVIRONMENT</span></div>
+  
+  <!-- Portail visuel (HTML) - désormais cliquable -->
   <div id="portalOverlay"></div>
 
+  <!-- Scène A-Frame -->
   <a-scene 
-    embedded 
+    embedded
     arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
     renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true; precision: high;"
     gesture-detector
-    xr-mode="mode: ar;"
     id="xrScene">
 
     <a-assets>
-      <!-- Assets existants -->
-      <img id="civ" src="civ.png">
-      <img id="cv" src="CVDanielHoba.jpg">
-      <img id="imgA1" src="A1.jpg">
-      <img id="imgA2" src="A2.jpg">
-      <img id="imgA3" src="A3.png"> 
-      <img id="imgA4" src="A4.jpg">
+      <!-- IMAGES DE REMPLACEMENT (URLs publiques) -->
+      <img id="civ" src="https://picsum.photos/200/150?random=1">
+      <img id="cv" src="https://picsum.photos/200/267?random=2">
+      <img id="imgA1" src="https://picsum.photos/200/200?random=3">
+      <img id="imgA2" src="https://picsum.photos/200/200?random=4">
+      <img id="imgA3" src="https://picsum.photos/200/200?random=5">
+      <img id="imgA4" src="https://picsum.photos/200/200?random=6">
       
-      <video id="videoCR" src="cr.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
-      <video id="videoBR" src="br.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      <!-- VIDEOS DE DÉMONSTRATION (Big Buck Bunny, libres) -->
+      <video id="videoCR" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
+      <video id="videoBR" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" preload="auto" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
       
-      <!-- Nouveaux assets pour XR -->
+      <!-- Textures supplémentaires -->
       <img id="grid" src="https://cdn.aframe.io/a-painter/images/grid.png">
       <img id="portalTexture" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/placeholder.jpg">
       
-      <!-- Sons pour XR -->
+      <!-- Sons -->
       <audio id="portalSound" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
       <audio id="modeSound" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
     </a-assets>
 
-    <!-- ENVIRONNEMENT AR FONDAMENTAL -->
+    <!-- ========= ENVIRONNEMENT AR ========= -->
     <a-entity id="arEnvironment" visible="true">
-      <!-- Marqueur Hiro -->
-      <a-marker preset="hiro" id="marker" raycaster="objects: .xr-interactable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;" xr-handler>
-        <!-- Feedback du marqueur -->
+      <a-marker preset="hiro" id="marker" emitevents="true" xr-handler>
+        <!-- Feedback visuel -->
         <a-ring color="#4FC3F7" radius-inner="0.08" radius-outer="0.12" rotation="-90 0 0" 
                 opacity="0.5" animation="property: rotation; to: -90 0 360; dur: 8000; loop: true; easing: linear"></a-ring>
       </a-marker>
 
-      <!-- Contenu AR attaché au marqueur (votre contenu original) -->
+      <!-- Contenu AR attaché au marqueur -->
       <a-entity id="arContent" position="0 0 0">
+        <!-- Bloc gauche -->
         <a-entity position="-1.5 0 0">
           <a-video src="#videoCR" class="xr-interactable xr-video"
                    position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
                    gesture-handler></a-video>
           <a-text value="AR Content 1" position="0 0.1 -0.7" rotation="-90 0 0" align="center" width="2" color="#4FC3F7"></a-text>
-
           <a-image src="#imgA1" class="xr-interactable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
           <a-image src="#imgA2" class="xr-interactable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-          
           <a-plane src="#civ" class="xr-interactable" gesture-handler position="-1 0.1 1" rotation="-90 0 0" width="1.5" height="1"></a-plane>
         </a-entity>
-
+        <!-- Bloc droit -->
         <a-entity position="1.5 0 0">
           <a-video src="#videoBR" class="xr-interactable xr-video"
                    position="0 0.1 0" rotation="-90 0 0" width="2" height="1.12"
                    gesture-handler></a-video>
           <a-text value="AR Content 2" position="0 0.1 -0.7" rotation="-90 0 0" align="center" width="2" color="#4FC3F7"></a-text>
-          
           <a-image src="#imgA3" class="xr-interactable" gesture-handler position="-0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
           <a-image src="#imgA4" class="xr-interactable" gesture-handler position="0.5 0.1 -1.5" rotation="-90 0 0" width="1"></a-image>
-
           <a-plane src="#cv" class="xr-interactable" gesture-handler position="1 0.1 1" rotation="-90 0 0" width="1.5" height="2"></a-plane>
         </a-entity>
       </a-entity>
     </a-entity>
 
-    <!-- PORTAL VR DANS L'ENVIRONNEMENT AR -->
-    <a-entity id="vrPortal" position="0 0.5 -2" scale="0.5 0.5 0.5" visible="false">
+    <!-- ========= PORTAL VR (3D) ========= -->
+    <!-- Ajout de la classe xr-interactable pour le rendre cliquable -->
+    <a-entity id="vrPortal" class="xr-interactable" position="0 0.5 -2" scale="0.5 0.5 0.5" visible="false">
       <a-ring color="#4FC3F7" radius-inner="0.9" radius-outer="1" rotation="0 0 0" 
               opacity="0.8" side="double"
-              animation="property: rotation; to: 0 360 0; dur: 20000; loop: true; easing: linear">
-      </a-ring>
-      
+              animation="property: rotation; to: 0 360 0; dur: 20000; loop: true; easing: linear"></a-ring>
       <a-ring color="#1565C0" radius-inner="0.8" radius-outer="0.9" rotation="0 180 0" 
               opacity="0.6" side="double"
-              animation="property: rotation; to: 0 -360 0; dur: 15000; loop: true; easing: linear">
-      </a-ring>
-      
+              animation="property: rotation; to: 0 -360 0; dur: 15000; loop: true; easing: linear"></a-ring>
       <a-text value="ENTER VR" position="0 1.5 0" align="center" width="3" color="#4FC3F7"
               animation="property: opacity; to: 0.3; dir: alternate; dur: 2000; loop: true"></a-text>
-      
       <a-light type="point" color="#4FC3F7" intensity="0.5" position="0 0 0" distance="10"></a-light>
     </a-entity>
 
-    <!-- ENVIRONNEMENT VR (intégré dans l'AR) -->
+    <!-- ========= ENVIRONNEMENT VR ========= -->
     <a-entity id="vrEnvironment" visible="false" position="0 0 0" scale="1 1 1">
-      <!-- Environnement spatial VR -->
-      <a-sky id="vrSky" color="#000022" visible="true"></a-sky>
-      
-      <!-- Sol VR -->
+      <a-sky id="vrSky" color="#000022"></a-sky>
       <a-circle id="vrGround" radius="10" rotation="-90 0 0" position="0 0 0" 
                 material="src: #grid; repeat: 20 20; transparent: true; opacity: 0.3;"></a-circle>
       
-      <!-- Contenu VR enrichi -->
       <a-entity id="vrContent" position="0 0.8 0">
         <!-- Module VR gauche -->
         <a-entity position="-2 0 0" 
                   animation__float="property: position; to: -2 0.2 0; dir: alternate; dur: 4000; easing: easeInOutSine; loop: true">
-          
           <a-video src="#videoCR" class="xr-interactable xr-video"
-                   position="0 0 0" width="1.8" height="1"
-                   material="side: double"
-                   animation="property: rotation; to: 0 360 0; dur: 40000; loop: true; easing: linear">
-          </a-video>
-          
-          <a-text value="VR EXPERIENCE 1" position="0 -0.7 0" align="center" width="2.5" 
-                  color="#4FC3F7" font="roboto"
+                   position="0 0 0" width="1.8" height="1" material="side: double"
+                   animation="property: rotation; to: 0 360 0; dur: 40000; loop: true; easing: linear"></a-video>
+          <a-text value="VR EXPERIENCE 1" position="0 -0.7 0" align="center" width="2.5" color="#4FC3F7" font="roboto"
                   animation__color="property: color; to: #FFC65D; dir: alternate; dur: 3000; loop: true"></a-text>
         </a-entity>
-        
         <!-- Module VR droit -->
         <a-entity position="2 0 0"
                   animation__float="property: position; to: 2 0.2 0; dir: alternate; dur: 4000; delay: 2000; easing: easeInOutSine; loop: true">
-          
           <a-video src="#videoBR" class="xr-interactable xr-video"
-                   position="0 0 0" width="1.8" height="1"
-                   material="side: double"
-                   animation="property: rotation; to: 0 -360 0; dur: 50000; loop: true; easing: linear">
-          </a-video>
-          
-          <a-text value="VR EXPERIENCE 2" position="0 -0.7 0" align="center" width="2.5" 
-                  color="#4FC3F7" font="roboto"
+                   position="0 0 0" width="1.8" height="1" material="side: double"
+                   animation="property: rotation; to: 0 -360 0; dur: 50000; loop: true; easing: linear"></a-video>
+          <a-text value="VR EXPERIENCE 2" position="0 -0.7 0" align="center" width="2.5" color="#4FC3F7" font="roboto"
                   animation__color="property: color; to: #FFC65D; dir: alternate; dur: 3000; delay: 1000; loop: true"></a-text>
         </a-entity>
         
-        <!-- Galerie VR circulaire -->
-        <a-entity id="vrGallery" rotation="0 0 0"
-                  animation="property: rotation; to: 0 360 0; dur: 60000; loop: true; easing: linear">
-          
-          <a-entity position="0 0 -3" class="xr-interactable">
-            <a-image src="#imgA1" width="1" height="1" rotation="0 0 0"></a-image>
-          </a-entity>
-          
-          <a-entity position="2.6 0 -1.5" class="xr-interactable" rotation="0 60 0">
-            <a-image src="#imgA2" width="1" height="1"></a-image>
-          </a-entity>
-          
-          <a-entity position="2.6 0 1.5" class="xr-interactable" rotation="0 120 0">
-            <a-image src="#imgA3" width="1" height="1"></a-image>
-          </a-entity>
-          
-          <a-entity position="0 0 3" class="xr-interactable" rotation="0 180 0">
-            <a-image src="#imgA4" width="1" height="1"></a-image>
-          </a-entity>
-          
-          <a-entity position="-2.6 0 1.5" class="xr-interactable" rotation="0 240 0">
-            <a-plane src="#civ" width="1" height="0.67"></a-plane>
-          </a-entity>
-          
-          <a-entity position="-2.6 0 -1.5" class="xr-interactable" rotation="0 300 0">
-            <a-plane src="#cv" width="1.5" height="2"></a-plane>
-          </a-entity>
+        <!-- Galerie VR circulaire (animation supprimée, gérée par requestAnimationFrame) -->
+        <a-entity id="vrGallery" rotation="0 0 0">
+          <a-entity position="0 0 -3" class="xr-interactable"><a-image src="#imgA1" width="1" height="1"></a-image></a-entity>
+          <a-entity position="2.6 0 -1.5" class="xr-interactable" rotation="0 60 0"><a-image src="#imgA2" width="1" height="1"></a-image></a-entity>
+          <a-entity position="2.6 0 1.5" class="xr-interactable" rotation="0 120 0"><a-image src="#imgA3" width="1" height="1"></a-image></a-entity>
+          <a-entity position="0 0 3" class="xr-interactable" rotation="0 180 0"><a-image src="#imgA4" width="1" height="1"></a-image></a-entity>
+          <a-entity position="-2.6 0 1.5" class="xr-interactable" rotation="0 240 0"><a-plane src="#civ" width="1" height="0.67"></a-plane></a-entity>
+          <a-entity position="-2.6 0 -1.5" class="xr-interactable" rotation="0 300 0"><a-plane src="#cv" width="1.5" height="2"></a-plane></a-entity>
         </a-entity>
         
-        <!-- Portail de retour vers AR -->
-        <a-entity id="backPortal" position="0 -2 0" class="xr-interactable">
+        <!-- Portail de retour vers AR (déjà interactable) -->
+        <a-entity id="backPortal" class="xr-interactable" position="0 -2 0">
           <a-ring color="#FFC65D" radius-inner="0.4" radius-outer="0.5" rotation="0 0 0" 
                   opacity="0.8" side="double"
-                  animation="property: rotation; to: 0 -360 0; dur: 10000; loop: true; easing: linear">
-          </a-ring>
+                  animation="property: rotation; to: 0 -360 0; dur: 10000; loop: true; easing: linear"></a-ring>
           <a-text value="RETOUR AR" position="0 0.6 0" align="center" width="1.5" color="#FFC65D"></a-text>
         </a-entity>
       </a-entity>
@@ -264,26 +217,30 @@
       <a-light type="directional" color="#FFFFFF" intensity="0.5" position="5 5 5"></a-light>
     </a-entity>
 
+    <!-- Caméra et curseur -->
     <a-entity camera position="0 1.6 0">
       <a-entity cursor="rayOrigin: mouse" raycaster="objects: .xr-interactable"></a-entity>
     </a-entity>
-
   </a-scene>
 
   <script>
-    // 1. INITIALISATION XR
+    // ========== POLYFILL / SECOURS POUR GESTURE HANDLER ==========
+    if (!AFRAME.components['gesture-handler']) {
+      AFRAME.registerComponent('gesture-handler', {
+        init: function() { /* dummy */ }
+      });
+    }
+
+    // ========== INITIALISATION XR ==========
     const overlay = document.getElementById('overlay');
     const startBtn = document.getElementById('startBtn');
     const xrHUD = document.getElementById('xrHUD');
     const modeIndicator = document.getElementById('modeIndicator');
     const portalOverlay = document.getElementById('portalOverlay');
-    
-    // Boutons de contrôle
     const resetBtn = document.getElementById('resetBtn');
     const modeBtn = document.getElementById('modeBtn');
     const effectsBtn = document.getElementById('effectsBtn');
     
-    // Éléments de scène
     const arEnvironment = document.querySelector('#arEnvironment');
     const arContent = document.querySelector('#arContent');
     const vrPortal = document.querySelector('#vrPortal');
@@ -291,13 +248,12 @@
     const backPortal = document.querySelector('#backPortal');
     const marker = document.querySelector('#marker');
     
-    // Variables XR
     let xrActive = false;
-    let currentMode = 'ar'; // 'ar' ou 'vr'
+    let currentMode = 'ar';
     let markerDetected = false;
     let portalVisible = false;
 
-    // 2. DÉMARRAGE DE L'EXPÉRIENCE
+    // ========== DÉMARRAGE ==========
     startBtn.addEventListener('click', () => {
       overlay.style.display = 'none';
       xrHUD.style.display = 'block';
@@ -306,30 +262,29 @@
       modeBtn.style.display = 'flex';
       effectsBtn.style.display = 'flex';
       
-      // Initialiser les vidéos
+      // Préparation des vidéos (sans force play pour respecter les politiques navigateur)
       document.querySelectorAll('video').forEach(v => {
-        v.play().then(() => v.pause()).catch(e => console.log("Auto-play prevented", e));
+        v.load();
+        v.play().then(() => v.pause()).catch(e => console.log("Vidéo prête (autoplay bloqué)", e));
       });
       
       console.log("XR Environment initialisé");
     });
 
-    // 3. COMPOSANT HANDLER POUR LE XR
+    // ========== COMPOSANT GESTIONNAIRE MARQUEUR ==========
     AFRAME.registerComponent('xr-handler', {
       init: function () {
-        const marker = this.el;
+        const markerEl = this.el;
         
-        marker.addEventListener('markerFound', () => {
-          console.log("Marqueur détecté - Environnement AR activé");
+        markerEl.addEventListener('markerFound', () => {
+          console.log("Marqueur détecté");
           markerDetected = true;
           xrActive = true;
           
-          // Afficher le HUD
           document.getElementById('currentMode').textContent = 'AR';
           document.getElementById('modeText').textContent = 'AR ENVIRONMENT';
           modeIndicator.style.backgroundColor = 'rgba(79, 195, 247, 0.7)';
           
-          // Afficher le portail VR après 3 secondes
           if (!portalVisible) {
             setTimeout(() => {
               vrPortal.setAttribute('visible', 'true');
@@ -340,18 +295,14 @@
                 easing: 'easeOutElastic'
               });
               portalVisible = true;
-              
-              // Afficher l'overlay du portail
-              portalOverlay.style.display = 'block';
+              portalOverlay.style.display = 'block'; // Affiche le portail HTML
             }, 3000);
           }
         });
 
-        marker.addEventListener('markerLost', () => {
+        markerEl.addEventListener('markerLost', () => {
           console.log("Marqueur perdu");
           markerDetected = false;
-          
-          // Si on est en mode AR, cacher le contenu
           if (currentMode === 'ar') {
             arContent.setAttribute('visible', 'false');
           }
@@ -359,122 +310,114 @@
       }
     });
 
-    // 4. INTERACTION AVEC LE PORTAL VR
-    vrPortal.addEventListener('click', () => {
-      if (markerDetected && portalVisible) {
-        console.log("Transition vers VR");
+    // ========== FONCTION DE TRANSITION VERS VR ==========
+    function enterVR() {
+      if (!markerDetected || !portalVisible) return;
+      console.log("Transition vers VR");
+
+      // Animation du portail HTML
+      portalOverlay.style.animation = 'none';
+      portalOverlay.style.backgroundColor = 'rgba(79,195,247,0.8)';
+      portalOverlay.style.transform = 'translate(-50%, -50%) scale(10)';
+      portalOverlay.style.transition = 'all 1.5s ease-in-out';
+
+      setTimeout(() => {
+        arEnvironment.setAttribute('visible', 'false');
+        vrPortal.setAttribute('visible', 'false');
+        vrEnvironment.setAttribute('visible', 'true');
         
-        // Animation de transition
-        portalOverlay.style.animation = 'none';
-        portalOverlay.style.backgroundColor = 'rgba(79,195,247,0.8)';
-        portalOverlay.style.transform = 'translate(-50%, -50%) scale(10)';
-        portalOverlay.style.transition = 'all 1.5s ease-in-out';
-        
-        // Cacher l'AR, montrer la VR
-        setTimeout(() => {
-          arEnvironment.setAttribute('visible', 'false');
-          vrPortal.setAttribute('visible', 'false');
-          vrEnvironment.setAttribute('visible', 'true');
-          
-          // Positionner la VR à l'emplacement du marqueur
+        // Positionne l'environnement VR sur le marqueur si possible
+        if (marker.object3D) {
           const markerPos = marker.object3D.position;
           vrEnvironment.object3D.position.set(markerPos.x, markerPos.y, markerPos.z);
-          
-          // Mettre à jour le mode
-          currentMode = 'vr';
-          document.getElementById('currentMode').textContent = 'VR';
-          document.getElementById('modeText').textContent = 'VR ENVIRONMENT';
-          modeIndicator.style.backgroundColor = 'rgba(255, 198, 93, 0.7)';
-          
-          // Lancer les vidéos en VR
-          document.querySelectorAll('.xr-video').forEach(v => {
-            const videoSrc = v.getAttribute('src');
-            if (videoSrc) {
-              const videoEl = document.querySelector(videoSrc);
-              if (videoEl) videoEl.play();
-            }
-          });
-          
-          // Réinitialiser l'overlay du portail
-          setTimeout(() => {
-            portalOverlay.style.display = 'none';
-            portalOverlay.style.transform = 'translate(-50%, -50%) scale(1)';
-            portalOverlay.style.transition = 'none';
-            portalOverlay.style.animation = 'portalPulse 3s infinite';
-          }, 2000);
-          
-          console.log("VR Environment activé dans l'AR");
-        }, 1000);
-      }
-    });
-
-    // 5. INTERACTION AVEC LE PORTAL DE RETOUR
-    backPortal.addEventListener('click', () => {
-      if (currentMode === 'vr') {
-        console.log("Retour vers AR");
+        }
         
-        // Animation de retour
-        vrEnvironment.setAttribute('animation', {
-          property: 'scale',
-          to: '0.01 0.01 0.01',
-          dur: 1000,
-          easing: 'easeInBack'
+        currentMode = 'vr';
+        document.getElementById('currentMode').textContent = 'VR';
+        document.getElementById('modeText').textContent = 'VR ENVIRONMENT';
+        modeIndicator.style.backgroundColor = 'rgba(255, 198, 93, 0.7)';
+        
+        // Lancer les vidéos en VR
+        document.querySelectorAll('.xr-video').forEach(v => {
+          const videoSrc = v.getAttribute('src');
+          if (videoSrc) {
+            const videoEl = document.querySelector(videoSrc);
+            if (videoEl) videoEl.play().catch(e => console.log("Lecture vidéo VR impossible", e));
+          }
         });
         
+        // Réinitialiser le portail HTML
         setTimeout(() => {
-          vrEnvironment.setAttribute('visible', 'false');
-          arEnvironment.setAttribute('visible', 'true');
-          vrPortal.setAttribute('visible', 'true');
-          
-          // Réinitialiser l'échelle de la VR
-          vrEnvironment.removeAttribute('animation');
-          vrEnvironment.setAttribute('scale', '1 1 1');
-          
-          // Mettre à jour le mode
-          currentMode = 'ar';
-          document.getElementById('currentMode').textContent = 'AR';
-          document.getElementById('modeText').textContent = 'AR ENVIRONMENT';
-          modeIndicator.style.backgroundColor = 'rgba(79, 195, 247, 0.7)';
-          
-          console.log("Retour à l'AR Environment");
-        }, 1000);
-      }
-    });
+          portalOverlay.style.display = 'none';
+          portalOverlay.style.transform = 'translate(-50%, -50%) scale(1)';
+          portalOverlay.style.transition = 'none';
+          portalOverlay.style.animation = 'portalPulse 3s infinite';
+        }, 2000);
+      }, 1000);
+    }
 
-    // 6. CONTRÔLES XR
-    // Bouton Réinitialiser
+    // ========== FONCTION DE RETOUR VERS AR ==========
+    function backToAR() {
+      if (currentMode !== 'vr') return;
+      console.log("Retour vers AR");
+      
+      vrEnvironment.setAttribute('animation', {
+        property: 'scale',
+        to: '0.01 0.01 0.01',
+        dur: 1000,
+        easing: 'easeInBack'
+      });
+      
+      setTimeout(() => {
+        vrEnvironment.setAttribute('visible', 'false');
+        arEnvironment.setAttribute('visible', 'true');
+        vrPortal.setAttribute('visible', 'true');
+        
+        vrEnvironment.removeAttribute('animation');
+        vrEnvironment.setAttribute('scale', '1 1 1');
+        
+        currentMode = 'ar';
+        document.getElementById('currentMode').textContent = 'AR';
+        document.getElementById('modeText').textContent = 'AR ENVIRONMENT';
+        modeIndicator.style.backgroundColor = 'rgba(79, 195, 247, 0.7)';
+      }, 1000);
+    }
+
+    // ========== ÉCOUTEURS DE CLIC SUR LES PORTAILS ==========
+    // Portail 3D (maintenant avec classe xr-interactable)
+    vrPortal.addEventListener('click', enterVR);
+    // Portail HTML (overlay)
+    portalOverlay.addEventListener('click', enterVR);
+    // Portail de retour
+    backPortal.addEventListener('click', backToAR);
+
+    // ========== BOUTONS DE CONTRÔLE ==========
     resetBtn.addEventListener('click', () => {
       if (currentMode === 'ar' && markerDetected) {
-        // Réinitialiser la position du contenu AR
         arContent.object3D.position.set(0, 0, 0);
         arContent.object3D.rotation.set(0, 0, 0);
       } else if (currentMode === 'vr') {
-        // Réinitialiser la position de la VR
         vrEnvironment.object3D.position.set(0, 0, 0);
         vrEnvironment.object3D.rotation.set(0, 0, 0);
       }
-      console.log("XR Environment réinitialisé");
     });
 
-    // Bouton Changer de mode
+    // Bascule de mode via bouton (émission d'un événement clic)
     modeBtn.addEventListener('click', () => {
       if (currentMode === 'ar' && markerDetected) {
-        // Simuler un clic sur le portail VR
-        vrPortal.components.click.emit('click');
+        vrPortal.emit('click');
       } else if (currentMode === 'vr') {
-        // Simuler un clic sur le portail de retour
-        backPortal.components.click.emit('click');
+        backPortal.emit('click');
       }
     });
 
-    // Bouton Effets
+    // Effets VR
     let effectsOn = true;
     effectsBtn.addEventListener('click', () => {
       if (currentMode === 'vr') {
         effectsOn = !effectsOn;
         const particles = document.querySelector('[particle-system]');
         const lights = document.querySelectorAll('[light]');
-        
         if (effectsOn) {
           particles.setAttribute('visible', 'true');
           lights.forEach(light => light.setAttribute('intensity', '0.5'));
@@ -493,18 +436,16 @@
       }
     });
 
-    // 7. INTERACTIONS VIDÉO DANS XR
+    // ========== LECTURE/PAUSE VIDÉO ==========
     document.addEventListener('click', function (evt) {
       const target = evt.target;
-      
       if (target.classList && target.classList.contains('xr-video')) {
-        const videoId = target.getAttribute('src'); 
+        const videoId = target.getAttribute('src');
+        if (!videoId) return;
         const videoEl = document.querySelector(videoId);
-        
         if (videoEl) {
           if (videoEl.paused) {
-            videoEl.play();
-            // Feedback visuel
+            videoEl.play().catch(e => console.log("Lecture vidéo impossible", e));
             target.setAttribute('animation', {
               property: 'scale',
               to: '1.1 1.1 1.1',
@@ -521,100 +462,45 @@
       }
     });
 
-    // 8. ANIMATIONS XR CONTINUES
+    // ========== ANIMATIONS XR (boucle) ==========
     function xrAnimations() {
       if (currentMode === 'vr' && vrEnvironment.getAttribute('visible') === 'true') {
-        // Faire tourner lentement la galerie VR
         const gallery = document.querySelector('#vrGallery');
         if (gallery) {
-          const currentRot = gallery.getAttribute('rotation') || {x: 0, y: 0, z: 0};
-          gallery.setAttribute('rotation', {
-            x: currentRot.x,
-            y: currentRot.y + 0.1,
-            z: currentRot.z
-          });
+          const rot = gallery.getAttribute('rotation') || {x:0, y:0, z:0};
+          gallery.setAttribute('rotation', {x: rot.x, y: rot.y + 0.1, z: rot.z});
         }
-        
-        // Animer les éléments flottants
-        const floaters = document.querySelectorAll('[animation__float]');
-        floaters.forEach((floater, index) => {
-          if (!floater.hasAttribute('animation__float')) {
-            const delay = index * 500;
-            floater.setAttribute('animation__float', {
-              property: 'position',
-              to: `0 ${0.2 + Math.random() * 0.3} 0`,
-              dir: 'alternate',
-              dur: 3000 + Math.random() * 2000,
-              delay: delay,
-              easing: 'easeInOutSine',
-              loop: true
-            });
-          }
-        });
       }
-      
       requestAnimationFrame(xrAnimations);
     }
-    
-    // Démarrer les animations
     xrAnimations();
 
-    // 9. GESTION CLAVIER POUR XR
+    // ========== DÉPLACEMENTS CLAVIER ==========
     document.addEventListener('keydown', (e) => {
       if (!xrActive) return;
-      
       const moveSpeed = 0.1;
       const rotateSpeed = 2;
       let target;
+      if (currentMode === 'ar') target = arContent.object3D;
+      else if (currentMode === 'vr') target = vrEnvironment.object3D;
+      else return;
       
-      if (currentMode === 'ar') {
-        target = arContent.object3D;
-      } else if (currentMode === 'vr') {
-        target = vrEnvironment.object3D;
-      } else {
-        return;
-      }
-      
-      const position = target.position;
-      const rotation = target.rotation;
+      const pos = target.position;
+      const rot = target.rotation;
       
       switch(e.key.toLowerCase()) {
-        case 'z':
-        case 'arrowup':
-          target.position.set(position.x, position.y, position.z - moveSpeed);
-          break;
-        case 's':
-        case 'arrowdown':
-          target.position.set(position.x, position.y, position.z + moveSpeed);
-          break;
-        case 'q':
-        case 'arrowleft':
-          target.position.set(position.x - moveSpeed, position.y, position.z);
-          break;
-        case 'd':
-        case 'arrowright':
-          target.position.set(position.x + moveSpeed, position.y, position.z);
-          break;
-        case ' ':
-          // Espace pour monter
-          target.position.set(position.x, position.y + moveSpeed, position.z);
-          break;
-        case 'shift':
-          // Shift pour descendre
-          target.position.set(position.x, position.y - moveSpeed, position.z);
-          break;
-        case 'a':
-          // Rotation gauche
-          target.rotation.set(rotation.x, rotation.y - rotateSpeed * Math.PI/180, rotation.z);
-          break;
-        case 'e':
-          // Rotation droite
-          target.rotation.set(rotation.x, rotation.y + rotateSpeed * Math.PI/180, rotation.z);
-          break;
+        case 'z': case 'arrowup':    target.position.set(pos.x, pos.y, pos.z - moveSpeed); break;
+        case 's': case 'arrowdown':  target.position.set(pos.x, pos.y, pos.z + moveSpeed); break;
+        case 'q': case 'arrowleft':  target.position.set(pos.x - moveSpeed, pos.y, pos.z); break;
+        case 'd': case 'arrowright': target.position.set(pos.x + moveSpeed, pos.y, pos.z); break;
+        case ' ':                    target.position.set(pos.x, pos.y + moveSpeed, pos.z); break;
+        case 'shift':                target.position.set(pos.x, pos.y - moveSpeed, pos.z); break;
+        case 'a':                    target.rotation.set(rot.x, rot.y - rotateSpeed * Math.PI/180, rot.z); break;
+        case 'e':                    target.rotation.set(rot.x, rot.y + rotateSpeed * Math.PI/180, rot.z); break;
       }
     });
 
-    console.log("XR Environment prêt - AR avec VR intégrée");
+    console.log("XR Environment corrigé - AR avec VR intégrée");
   </script>
 </body>
 </html>
